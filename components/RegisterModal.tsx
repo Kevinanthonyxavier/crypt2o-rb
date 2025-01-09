@@ -67,22 +67,54 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
   ////////////
   const { toast } = useToast();
   const router = useRouter();
-  const [, setIpAddress] = useState('');
+  //const [, setIpAddress] = useState('');
 
+  const [, setIpAddress] = useState<string | null>(null);
+  const [, setLocation] = useState<{
+    country: string;
+    region: string;
+    city: string;
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   useEffect(() => {
-    // Fetch IP address
-    const fetchIpAddress = async () => {
+    let isMounted = true; // To prevent state updates if the component unmounts
+
+    const fetchIpData = async () => {
       try {
-        const response = await axios.get('https://api.ipify.org?format=json');
-        setIpAddress(response.data.ip);
+        const response = await axios.get('https://ipwhois.app/json/');
+        if (isMounted && response.data) {
+          const { ip, country, region, city, latitude, longitude } = response.data;
+          setIpAddress(ip);
+          setLocation({ country, region, city, latitude, longitude });
+        }
       } catch (error) {
-        console.error('Error fetching IP address:', error);
+        console.error('Error fetching IP data:', error);
       }
     };
 
-    fetchIpAddress();
+    fetchIpData();
+
+    return () => {
+      isMounted = false; // Cleanup function to avoid memory leaks
+    };
   }, []);
+
+
+  // useEffect(() => {
+  //   // Fetch IP address
+  //   const fetchIpAddress = async () => {
+  //     try {
+  //       const response = await axios.get('https://api.ipify.org?format=json');
+  //       setIpAddress(response.data.ip);
+  //     } catch (error) {
+  //       console.error('Error fetching IP address:', error);
+  //     }
+  //   };
+
+  //   fetchIpAddress();
+  // }, []);
 
 
   const [registerForm, setRegisterForm] = useState({
@@ -182,12 +214,22 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
       setIsLoading(true);
     
       try {
-        const ipResponse = await axios.get('https://api.ipify.org?format=json');
+    //     const ipResponse = await axios.get('https://api.ipify.org?format=json');
+    // const ipAddress = ipResponse.data.ip;
+
+    // // Fetch the location based on IP address
+    // const locationResponse = await axios.get(`http://ip-api.com/json/${ipAddress}`);
+    // const { country, regionName, city, lat, lon } = locationResponse.data;
+
+    // Fetch the user's IP address
+    const ipResponse = await axios.get('https://api.ipify.org?format=json');
     const ipAddress = ipResponse.data.ip;
 
-    // Fetch the location based on IP address
-    const locationResponse = await axios.get(`http://ip-api.com/json/${ipAddress}`);
-    const { country, regionName, city, lat, lon } = locationResponse.data;
+    // Fetch the location based on the IP address using ipwhois.io
+    const locationResponse = await axios.get(`https://ipwhois.app/json/${ipAddress}`);
+    const { country, region, city, latitude, longitude } = locationResponse.data;
+
+   
         // Create a new user with Firebase Authentication
         const userCredential = await createUserWithEmailAndPassword(
           auth,
@@ -224,16 +266,14 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
           hideVerification: false,
           popupVerification: false,
           createdAt: serverTimestamp(),
-          ipAddress: ipAddress, 
+          ipAddress: ipAddress || 'Unknown', // Fallback for IP address
           location: {
-            country,
-            region: regionName,
-            city,
-            latitude: lat,
-            longitude: lon,
+            country: country || 'Unknown',
+            region: region || 'Unknown',
+            city: city || 'Unknown',
+            latitude: latitude || 0,
+            longitude: longitude || 0,
           },
-
-        
         });
     
         console.log("User registered successfully:", userCredential);

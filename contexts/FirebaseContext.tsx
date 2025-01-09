@@ -15,6 +15,8 @@ import {
   sendEmailVerification,
 } from 'firebase/auth';
 import { app, auth, db } from '@/lib/firebase';
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 
 // Firebase Context Interface
 interface FirebaseContextType {

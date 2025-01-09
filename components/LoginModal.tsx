@@ -76,7 +76,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         return; // Early return to prevent further execution
       }
 
-      const response = await fetch('/api/send-otp', {
+      const response = await fetch('/api/send-otp.ts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email }),

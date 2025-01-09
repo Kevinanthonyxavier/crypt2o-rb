@@ -174,7 +174,7 @@ const CryptoRecoveryTab: React.FC = () => {
                 onChange={(e) => setWalletAddress(e.target.value)}
                 className="text-lg bg-gray-700 text-white border border-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" // Added focus styles
                 style={{ borderRadius: '0.5rem' }}
-                maxLength={15}
+                maxLength={50}
                 minLength={10}
                 placeholder="JGFYSFYWJgB&WEYIWEGYDFG"
                 required

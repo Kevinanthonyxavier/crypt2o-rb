@@ -49,7 +49,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "types/**/*",
-    "pages/dashboard/page.tsx",
+    "app/dashboard/page.tsx",
     "src/**/*"
   ],
   "exclude": [
