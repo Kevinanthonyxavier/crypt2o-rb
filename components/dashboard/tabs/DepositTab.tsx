@@ -385,12 +385,12 @@ if (method === "Bank") {
       
 
      
-        <div  style={{ borderRadius: '2rem' }} className="py-4 mx-4 flex items-center justify-center bg-gray-800 border border-gray-700"> {/* Full-height centering container with gray background */}
-      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+        <div  style={{ borderRadius: '2rem' }} className=" py-4 mx-12 mb-12 flex items-center justify-center bg-gray-800 border border-gray-700"> {/* Full-height centering container with gray background */}
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
         <Card
           // Maintain margin and border-radius
           
-          className="mx-4 w-auto sm:w-[500px] sm:w-py-8 md:w-[500px] lg:w-[600px]  h-auto  bg-gray-800 card-no-border" // Use the same gray color for the card
+          className="mx-8 w-auto sm:w-[500px] sm:w-py-8 md:w-[500px] lg:w-[600px]  h-auto  bg-gray-800 card-no-border" // Use the same gray color for the card
         >
           <div className="  items-center justify-center w-[800] py-8"> {/* Centering content */}
             <CardHeader className="w-full text-center">

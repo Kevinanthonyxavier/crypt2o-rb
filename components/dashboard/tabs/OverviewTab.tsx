@@ -39,10 +39,10 @@ export interface OverviewTabProps {
 
 
 
-
-const OverviewTab: React.FC<OverviewTabProps> = ({  
+const OverviewTab: React.FC = () => {
+//const OverviewTab: React.FC<OverviewTabProps> = ({  
   
-}) => {
+//}) => {
   const [, setCurrentPage] = useState<string>('');
 
   //const { toast } = ToastContainer();

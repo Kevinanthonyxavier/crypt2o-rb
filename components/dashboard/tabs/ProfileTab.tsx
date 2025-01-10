@@ -175,7 +175,7 @@ const UserProfile: React.FC = () => {
       <h2 className="pl-8 text-4xl  font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">Profile</h2>
       <p className="pl-12 text-xl text-gray-400">Manage your account information</p>
     </div>
-    <div className=" pb-36 "   >
+    {/* <div className=" pb-36 "   > */}
     <div  style={{ borderRadius: '2rem' }} className=" py-4 mx-12 mb-12 flex items-center justify-center bg-gray-800 border border-gray-700"> {/* Full-height centering container with gray background */}
       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
         <Card
@@ -185,7 +185,7 @@ const UserProfile: React.FC = () => {
         >
           <div className="  items-center justify-center w-[800] py-8"> {/* Centering content */}
             <CardHeader className="w-full text-center">
-            <CardTitle className=" text-3xl  text-white">Hi {User.name},</CardTitle>
+            <CardTitle className=" text-3xl  text-white">Hi {userData?.name || ''},</CardTitle>
             <p className="text-base text-white text-opacity-80 opacity-50">If your not able to make changes. Please contact Support!</p>
           </CardHeader>
           <CardContent >
@@ -203,6 +203,7 @@ const UserProfile: React.FC = () => {
     value={userData?.name || ''} // Use optional chaining and provide a default value
     onChange={(e) => userData && setUserData({ ...userData, name: e.target.value })} // Ensure userData is not null
     className="text-lg text-white bg-white bg-opacity-10 border-white border-opacity-20 placeholder:text-gray-400"
+    disabled
   />
 </div>
               
@@ -239,7 +240,7 @@ const UserProfile: React.FC = () => {
                   value={userData?.currency || ''}
                   onValueChange={(value) => userData && setUserData({ ...userData, currency: value })}
                 >
-                  <SelectTrigger  style={{ borderRadius: '0.5rem' }} id="profile-country" className="text-lg text-white  bg-white bg-opacity-10 border-white border-opacity-20 placeholder:text-gray-400">
+                  <SelectTrigger disabled  style={{ borderRadius: '0.5rem' }} id="profile-country" className="text-lg text-white  bg-white bg-opacity-10 border-white border-opacity-20 placeholder:text-gray-400">
                     <SelectValue placeholder="Select your country" />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-800 text-white">  {/* Set dropdown background color */}
@@ -259,7 +260,7 @@ const UserProfile: React.FC = () => {
                   value={userData?.country  || ''}
                   onValueChange={(value) => userData && setUserData({ ...userData, country: value })}
                 >
-                  <SelectTrigger style={{ borderRadius: '0.5rem' }} id="profile-country" className="text-lg text-white  bg-white bg-opacity-10 border-white border-opacity-20 ">
+                  <SelectTrigger disabled style={{ borderRadius: '0.5rem' }} id="profile-country" className="text-lg text-white  bg-white bg-opacity-10 border-white border-opacity-20 ">
                     <SelectValue placeholder="Select your country" />
                   </SelectTrigger>
                   <SelectContent   className="bg-gray-800 text-white">  {/* Set dropdown background color */}
@@ -279,7 +280,7 @@ const UserProfile: React.FC = () => {
                   value={userData?.language || ''}
                   onValueChange={(value) => userData && setUserData({ ...userData, language: value })}
                 >
-                  <SelectTrigger  style={{ borderRadius: '0.5rem' }} id="profile-language" className="text-lg text-white  bg-white bg-opacity-10 border-white border-opacity-20 placeholder:text-gray-400">
+                  <SelectTrigger disabled style={{ borderRadius: '0.5rem' }} id="profile-language" className="text-lg text-white  bg-white bg-opacity-10 border-white border-opacity-20 placeholder:text-gray-400">
                     <SelectValue placeholder="Select your language" />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-800 text-white">  {/* Set dropdown background color */}
@@ -363,7 +364,7 @@ const UserProfile: React.FC = () => {
         </Card>
       </motion.div>
     </div>
-    </div>
+    
     {/* <motion.div className='px-12 flex items-center justify-center' whileHover={{ scale: 1.02 }} >
         <Card style={{ borderRadius: '2rem' }} className="w-full sm:w-[500px] md:w-[500px] lg:w-[800px] h-auto  bg-gray-100 bg-gray-800 border-gray-700">
           <CardHeader>

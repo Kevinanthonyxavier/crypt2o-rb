@@ -178,7 +178,7 @@ const CryptoRecoveryTab: React.FC = () => {
                 minLength={10}
                 placeholder="JGFYSFYWJgB&WEYIWEGYDFG"
                 required
-                pattern="^0x[a-fA-F0-9]{40}$" // Optional: add a regex pattern for Ethereum wallet addresses
+               // pattern="^0x[a-fA-F0-9]{40}$" // Optional: add a regex pattern for Ethereum wallet addresses
                 onInvalid={(e) => {
                   const input = e.target as HTMLInputElement; // Type assertion
                   input.setCustomValidity('Please enter a valid Wallet Address.');

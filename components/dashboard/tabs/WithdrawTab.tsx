@@ -20,11 +20,12 @@ import { FaEthereum } from "react-icons/fa";
 import { SiDogecoin, SiTether } from "react-icons/si";
 import { LoaderCircle } from 'lucide-react';
 
-type WithdrawProps = {
-  setCurrentPage: (page: string) => void;
-};
+// type WithdrawProps = {
+//   setCurrentPage: (page: string) => void;
+//};
 
-const Withdraw: React.FC<WithdrawProps> = ({  }) => {
+//const Withdraw: React.FC<WithdrawProps> = ({  }) => {
+  const Withdraw: React.FC = () => {
   const { toast } = useToast();
 
   const [amount, setAmount] = useState<string>('');
@@ -278,7 +279,7 @@ const Withdraw: React.FC<WithdrawProps> = ({  }) => {
 
       <div >
         <motion.div >
-          <Card style={{ borderRadius: '2rem' }} className="mx-4 px-8 pb-12 w-auto h-auto bg-gray-100 bg-gray-800 border-gray-700">
+          <Card style={{ borderRadius: '2rem' }} className="mx-4 px-8 pb-12 w-auto bg-gray-100 bg-gray-800 border-gray-700">
             <CardHeader>
               <CardTitle className="text-white">Portfolio</CardTitle>
               </CardHeader>
@@ -698,7 +699,7 @@ const Withdraw: React.FC<WithdrawProps> = ({  }) => {
         <Card
           // Maintain margin and border-radius
           
-          className="mx-8 w-auto sm:w-[500px] sm:w-py-8 md:w-[500px] lg:w-[600px]  h-auto  bg-gray-800 card-no-border" // Use the same gray color for the card
+          className="mx-8 w-auto sm:w-[500px] sm:w-py-8 md:w-[500px] lg:w-[600px]    bg-gray-800 card-no-border" // Use the same gray color for the card
         >
           <div className="  items-center justify-center w-[800] py-8"> {/* Centering content */}
             <CardHeader className="w-full text-center">
@@ -716,12 +717,12 @@ const Withdraw: React.FC<WithdrawProps> = ({  }) => {
   
      
 
-            <CardContent className=" pb-12 w-full sm:w-[500px] md:w-[500px] lg:w-[600px] h-auto ">
+            <CardContent className=" pb-12 w-full sm:w-[500px] md:w-[500px] lg:w-[600px] ">
 
             <form onSubmit={(e) => { e.preventDefault(); handleWithdraw(); }} className="space-y-4">
       {/* Cryptocurrency Selection */}
       <div className="space-y-2">
-        <Label htmlFor="currency" className="text-white">Select Cryptocurrency</Label>
+        <Label htmlFor="currency" className="text-lg text-white">Select Cryptocurrency</Label>
         <Select onValueChange={setCrypto} value={currency}>
           <SelectTrigger style={{ borderRadius: '0.5rem' }} id="currency"                     
           className="text-lg bg-gray-700 text-white border border-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"

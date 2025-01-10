@@ -1,5 +1,5 @@
 'use client'
-
+//new
 import { motion } from 'framer-motion'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
@@ -15,7 +15,7 @@ import { FirebaseProvider } from '@/contexts/FirebaseContext'
 export default function Home() {
   return (
     <FirebaseProvider>
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 text-white overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 text-white ">
       {/* <ParticleBackground /> */}
       <FallingCryptoLogos />
 

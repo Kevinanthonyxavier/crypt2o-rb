@@ -25,7 +25,7 @@ const Header: React.FC = () => {
   if (!user) return null;
 
   return (
-    <div className="bg-gray-900 min-h-screen overflow-y-auto">
+    <div className="bg-gray-900 min-h-screen overflow-auto">
       <header className="flex justify-between items-center mb-2 p-4">
         <motion.div 
           initial={{ opacity: 0, y: -20 }} 
@@ -33,7 +33,10 @@ const Header: React.FC = () => {
           transition={{ duration: 0.5 }} 
         >
           <motion.h2 
-            className="pt-4 text-3xl font-bold ml-4"
+            className="pt-4  font-bold ml-4"
+            style={{
+              fontSize: "clamp(1.0rem, 5vw, 1.8rem)", // Min size, fluid size, max size
+            }}
             onMouseEnter={() => headerAnimation.start({ scale: 1.08 })}
             onMouseLeave={() => headerAnimation.start({ scale: 1 })}
             animate={headerAnimation} 

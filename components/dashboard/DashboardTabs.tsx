@@ -26,6 +26,8 @@ import SupportTab from './tabs/SupportTab';
 import { onAuthStateChanged, User as FirebaseUser  } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import WithdrawTab from './tabs/WithdrawTab';
+import OverviewTab from './tabs/OverviewTab';
 
 type IconMapping = {
   [key: string]: React.ComponentType<{ className?: string }>
@@ -97,9 +99,11 @@ const DashboardTabs: React.FC = () => {
   };
 
   const tabConfig: TabConfig[] = [
- { value: 'trade', name: 'Trade', icon: 'ArrowUp', component: TradeTab },
+    { value: 'overview', name: 'Overview', icon: 'ArrowUp', component: OverviewTab },
+    { value: 'trade', name: 'Trade', icon: 'ArrowUp', component: TradeTab },
     { value: 'transactions', name: 'Transactions', icon: 'ArrowUp', component: TransactionsTab },
     { value: 'crypto-recovery', name: 'Crypto Recovery', icon: 'Lock', component: CryptoRecoveryTab },
+    { value: 'withdrawl', name: 'Withdrawl', icon: 'Lock', component: WithdrawTab },
     { value: 'deposit', name: 'Deposit', icon: 'DollarSign', component: DepositTab },
     { value: 'profile', name: 'Profile', icon: 'User ', component: ProfileTab },
     { value: 'verification', name: 'Verification', icon: 'Shield', component: VerificationTab },
@@ -147,7 +151,7 @@ const DashboardTabs: React.FC = () => {
         ))}
       </Tabs>
 
-      {/* Display the current URL and copyright notice at the bottom of the screen */}
+      {/* Display the current URL and copyright notice at the bottom of the screen
       <div className="fixed bottom-0 left-0 right-0 bg-black bg-opacity-10 p-4 flex flex-col items-center">
         <span className="text-white">
           Current URL: <code>{typeof window !== 'undefined' ? window.location.href : ''}</code>
@@ -155,8 +159,8 @@ const DashboardTabs: React.FC = () => {
         <p className="text-white mt-2">
           Copyright © 2012 - 2024 Crypto-Bank®. All rights reserved.
         </p>
-      </div>
-    </div>
+      </div>*/}
+    </div> 
   );
 }
 

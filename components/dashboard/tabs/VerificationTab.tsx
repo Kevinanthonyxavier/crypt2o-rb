@@ -293,7 +293,7 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
         <Card style={{ borderRadius: '1rem' }} className="w-full sm:w-[500px] md:w-[500px] lg:w-[600px]  bg-gray-800 border-gray-700">
           <CardHeader>
             <CardTitle className="text-3xl text-white">Verification Process</CardTitle>
-            <CardDescription className="text-base" >Step {currentStep + 1} of {steps.length}: {steps[currentStep]}</CardDescription>
+            <CardDescription className="text-base text-white" >Step {currentStep + 1} of {steps.length}: {steps[currentStep]}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleVerificationSubmit} className="space-y-4">
@@ -452,7 +452,9 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
         src={previewUrls.idFront} 
         alt="Front ID  Preview" 
         className="absolute inset-0 h-full w-full object-cover rounded-lg opacity-40 z-0" // Centered image with transparency
-      />
+        width={500}
+        height={300}
+        />
     )}
               
               
@@ -488,6 +490,9 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
                     src={previewUrls.idBack} 
                     alt="Back ID  Preview" 
                     className="absolute inset-0 h-full w-full object-cover rounded-lg opacity-40 z-0" // Centered image with transparency
+                    width={500}
+                    height={300}
+                  
                   />
                 )}  
                             
@@ -527,6 +532,8 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
         src={previewUrls.selfie} 
         alt="Selfie Preview" 
         className="absolute inset-0 h-full w-full object-cover rounded-lg opacity-40 z-0" // Centered image with transparency
+        width={500}
+        height={300}
       />
     )}
     <div className="text-center z-10"> {/* Ensure content is above the image */}
@@ -581,7 +588,7 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
               >
                 {loading ? (
                   <>
-                    <span className="loader"></span>
+                    
                     Submitting...
                   </>
                 ) : (
@@ -608,7 +615,7 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
             <DialogFooter>
             <Button 
   style={{ borderRadius: '0.5rem' }} 
-  className="w-[25%] bg-purple-500 hover:bg-purple-600 text-white" 
+  className="w-[25%] bg-purple-500 hover:bg-purple-600 text-white text-base" 
   onClick={() => {
     setshowSubmissionPopup(false); // Close the popup
     window.location.reload(); // Refresh the page
@@ -619,9 +626,12 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
 
               
 <Link  href="/dashboard?tab=overview">
-                <button style={{ borderRadius: '0.5rem' }} className=" w-[25%] bg-purple-500 hover:bg-purple-600 text-white">
-                  Go to Overview
-                </button>
+<button
+      style={{ borderRadius: '0.5rem' }}
+      className="w-[115%] bg-purple-500 hover:bg-purple-600 text-white text-base py-2"
+    >
+      Go to Overview
+    </button>
               </Link>
             </DialogFooter>
           </DialogContent>
