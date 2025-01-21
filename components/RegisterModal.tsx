@@ -259,9 +259,9 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
           totalBalance: 0,
           btc: 0,
           eth: 0,
-          rec: 100,
+          rec: 0,
           usdt: 0,
-          doge: 1,
+          doge: 0,
           isVerified: false,
           hideVerification: false,
           popupVerification: false,
@@ -327,12 +327,12 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
     
     <Dialog open={isOpen} onOpenChange={onClose}>
       
-      <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white">
+      <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white max-h-screen overflow-y-auto">
         
         <DialogHeader>
           
           <DialogTitle className="text-2xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-            {showOtpInput ? 'Verify Your Email' : 'Create a Crypto-Bank Account'}
+            {showOtpInput ? 'Verify Your Email' : 'Create a Crypt2o.com Account'}
           </DialogTitle>
         </DialogHeader>
         {/* <form onSubmit={handleSubmit} className="space-y-4"> */}

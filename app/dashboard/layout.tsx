@@ -21,7 +21,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
-        router.push('/login');
+        router.push('/#');
       }
     });
 

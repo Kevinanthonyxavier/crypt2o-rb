@@ -17,7 +17,7 @@ export default function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h3 className="text-lg font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Crypto-Bank</h3>
+            <h3 className="text-lg font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Crypt2o.com</h3>
             <p className="text-gray-400">Secure and innovative cryptocurrency banking solutions.</p>
           </motion.div>
           <motion.div
@@ -63,7 +63,7 @@ export default function Footer() {
           className="border-t border-gray-800 pt-8 mt-8"
         >
           <h4 className="text-lg font-semibold mb-4 text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Become an Affiliate</h4>
-          <p className="text-gray-400 text-center mb-4">Join our affiliate program and earn rewards for referring new customers to Crypto-Bank.</p>
+          <p className="text-gray-400 text-center mb-4">Join our affiliate program and earn rewards for referring new customers to Crypt2o.com</p>
           <div className="flex flex-col items-center">
             <Button 
               className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-300"
@@ -87,7 +87,7 @@ export default function Footer() {
           transition={{ duration: 0.5, delay: 0.5 }}
           className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400"
         >
-          <p>&copy; {new Date().getFullYear()} Crypto-Bank. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Crypt2o.com All rights reserved.</p>
         </motion.div>
       </div>
       <div className="absolute inset-0 z-0 opacity-30">

@@ -77,7 +77,7 @@ export default function Hero() {
           variants={itemVariants}
           className="text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600"
         >
-          Welcome to Crypto-Bank
+          Welcome to Crypt2o.com
         </motion.h1>
         <motion.div
           variants={itemVariants}

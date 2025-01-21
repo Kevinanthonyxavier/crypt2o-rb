@@ -13,6 +13,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { showToast } from '@/utils/toast';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
+import { sendPasswordResetEmail } from 'firebase/auth';
 
 
 
@@ -44,6 +45,34 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [error, setError] = useState<string | null>(null);
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const { toast } = useToast();
+  //forgotpassword
+  const [isForgotPassword, setIsForgotPassword] = useState(false); // New state for forgot password
+
+// Forgot Password Handler
+const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setIsLoading(true);
+
+  try {
+    await sendPasswordResetEmail(auth, loginForm.email);
+    toast({
+      title: 'Password Reset Email Sent',
+      description: 'Check your email for the password reset link.',
+      variant: 'default',
+    });
+    setIsForgotPassword(false); // Close forgot password dialog
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    toast({
+      title: 'Error',
+      description: 'Failed to send password reset email. Please try again.',
+      variant: 'destructive',
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
 
   //
@@ -170,7 +199,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   
       toast({
         title: 'Login Successful',
-        description: 'Welcome to Crypto-Bank!',
+        description: 'Welcome to Crypt2o.com!',
         variant: 'default',
       });
   
@@ -245,6 +274,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     }
   };
 
+  
+
   return (
     
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -253,10 +284,34 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-            Login to Crypto-Bank
+          {isForgotPassword ? 'Forgot Password' : 'Login to Crypt2o.com'}
+
           </DialogTitle>
         </DialogHeader>
         {!isOtpStage ? (
+          isForgotPassword ? (
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <Label htmlFor="reset-email">Enter your email to reset password</Label>
+              <Input
+                id="reset-email"
+                type="email"
+                placeholder="Enter your email"
+                value={loginForm.email}
+                onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+              />
+              <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700" disabled={isLoading}>
+                {isLoading ? 'Sending...' : 'Send Reset Link'}
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setIsForgotPassword(false)}
+                className="w-full bg-gray-600 hover:bg-gray-700"
+              >
+                Back to Login
+              </Button>
+            </form>
+          ) : (
               <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -306,6 +361,15 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             />
             
           </div>
+          <div className="text-right">
+              <button
+                type="button"
+                onClick={() => setIsForgotPassword(true)}
+                className="text-sm text-purple-400 hover:underline"
+              >
+                Forgot Password?
+              </button>
+            </div>
           {error && (
   <motion.p
     initial={{ opacity: 0 }}
@@ -321,8 +385,11 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           disabled={isLoading}>
           {isLoading ? 'Signing In...' : 'Login'}
           </Button>
-        </form>
-        ) : (
+        
+         
+       </form>
+          )
+        )  : (
 
           <div className="space-y-4">
 <Label htmlFor="otp" className="text-white">

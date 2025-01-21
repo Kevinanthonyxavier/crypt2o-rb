@@ -135,10 +135,10 @@ export default function AboutUs() {
             variants={itemVariants}
             className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600"
           >
-            About Crypto-Bank
+            About Crypt2o.com
           </motion.h2>
           <motion.p variants={itemVariants} className="text-lg mb-6 text-gray-300">
-            Crypto-Bank is at the forefront of the digital finance revolution. Founded in 2023, we&apos;ve quickly become a trusted name in cryptocurrency banking, offering innovative solutions for the modern investor.
+          Crypt2o.com is at the forefront of the digital finance revolution. Founded in 2023, we&apos;ve quickly become a trusted name in cryptocurrency banking, offering innovative solutions for the modern investor.
           </motion.p>
           <motion.p variants={itemVariants} className="text-lg mb-6 text-gray-300">
             Our mission is to make cryptocurrency accessible, secure, and beneficial for everyone. We combine cutting-edge blockchain technology with user-friendly interfaces to provide a seamless banking experience.

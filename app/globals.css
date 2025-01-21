@@ -2,85 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global Styles */
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-
+/* Custom Classes */
 .rounded-black-border {
   border: 2px solid black; /* Set the border width and color */
-  border-radius: 8px; /* Adjust the radius for rounded corners */
-  padding: 16px; /* Add some padding inside the div */
-  background-color: transparent; /* Set background to transparent */
+  border-radius: 8px; /* Rounded corners */
+  padding: 16px; /* Inner padding */
+  background-color: transparent; /* Transparent background */
 }
 
-.toast-destructive {
-  background-color: #f8d7da; /* Light red background for destructive */
-  color: #721c24; /* Dark red text for contrast */
-  border: 1px solid #f5c6cb; /* Border color */
-}
-
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-  }
-
-  .dark {
-    --background: 224 71% 4%;
-    --foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
-  }
-}
-/* Add this to your global styles or the component's scoped styles */
-.loader {
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top: 4px solid #fff;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-
-
-.custom-placeholder::placeholder {
-  color: gray; /* Default color */
-}
-
-.custom-placeholder:focus::placeholder {
-  color: lightgray; /* Color on focus */
-}
-
-
-
-
-/* @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
- */
-
-
-
-/* toast.css */
-
+/* Toast Styles */
 .toast-overlay {
   position: fixed;
   top: 0;
@@ -88,11 +23,11 @@ body {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
-  z-index: 9998; /* Just below the toast */
+  z-index: 9998; /* Below the toast */
 }
 
 .toast {
-  margin-top: 32rem;
+  margin-top: 32rem; /* Vertical positioning */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -104,8 +39,8 @@ body {
   position: fixed; /* Fixed positioning */
   top: 50%; /* Center vertically */
   left: 50%; /* Center horizontally */
-  transform: translate(-50%, -50%); /* Move it back by half its width and height */
-  z-index: 9999; /* Ensure it appears on top of other elements */
+  transform: translate(-50%, -50%); /* Centering */
+  z-index: 9999; /* Ensure it appears on top */
 }
 
 .toast-success {
@@ -132,14 +67,21 @@ body {
   font-size: 0.875rem; /* Text-sm */
 }
 
-/* ///////////////////////// */
-
-/* Override the close button */
-.dialog-close-button {
-  display: none !important;
+/* Loader Styles */
+.loader {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid #fff;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
 }
 
-/* Custom Scrollbar ```css
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -150,46 +92,32 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(158, 157, 157, 0.5);
+  background: rgb(206, 147, 216);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(7, 7, 7, 0.7);
+  background: rgb(171, 71, 188);
 }
 
-/* styles.css */
-
+/* Card Styles */
 .card {
   background: linear-gradient(to bottom right, #6b46c1, #5a67d8); /* Gradient background */
   border: none; /* Remove default border */
   border-radius: 0.5rem; /* Rounded corners */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Shadow effect */
-  padding: 1.5rem; /* Padding inside the card */
+  padding: 1.5rem; /* Inner padding */
   color: white; /* Text color */
   max-width: 300px; /* Set maximum width */
-  width: 100%; /* Allow the card to take full width of its container */
-  margin: auto; /* Center card horizontally */
+  width: 100%; /* Full width */
+  margin: auto; /* Center card */
 }
-
-.cardcryptobal {
-  /* background: linear-gradient(to bottom right, #6b46c1, #5a67d8); Gradient background */
-  border: none; /* Remove default border */
-  border-radius: 0.5rem; /* Rounded corners */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Shadow effect */
-  padding: 1.5rem; /* Padding inside the card */
-  color: white; /* Text color */
-  max-width: 300px; /* Set maximum width */
-  width: 100%; /* Allow the card to take full width of its container */
-  margin: auto; /* Center card horizontally */
-}
-
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem; /* Space below the header */
+  margin-bottom: 0.5rem; /* Space below header */
 }
 
 .card-title {
@@ -217,10 +145,10 @@ body {
 }
 
 .card-no-border {
-  border: none; /* Remove any borders */
+  border: none; /* Remove borders */
 }
 
-/* Add to a global CSS file or a module */
+/* Background Particles */
 #tsparticles {
   position: fixed;
   top: 0;
@@ -228,83 +156,37 @@ body {
   width: 100%;
   height: 100%;
   z-index: -1; /* Keeps it behind content */
-  pointer-events: none; /* Ensures no interference with clicks */
+  pointer-events: none; /* No interference with clicks */
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
- 
+/* Dark Mode Styles */
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
- 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
- 
+    --foreground: 222.2 47.4% 11.2%;
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
- 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
- 
-    /* --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%; */
- 
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
- 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
- 
-    --radius: 0.5rem;
   }
- 
+
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 224 71% 4%;
     --foreground: 210 40% 98%;
- 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
- 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
- 
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
- 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
- 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 216 34% 17%;
     --accent-foreground: 210 40% 98%;
- 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
- 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
   }
 }
- 
+
+/* Utility Classes */
 @layer base {
   * {
     @apply border-border;
   }
+  
   body {
     @apply bg-background text-foreground;
   }
 }
-

@@ -28,9 +28,11 @@ interface VerificationTabProps {
 }
 
 type FormData = {
+  idName: string;
   idType: string;
   idNumber: string;
   idExpiry: string;
+  userDob: string;
   addressLine1: string;
   addressLine2: string;
   city: string;
@@ -53,8 +55,10 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
   const [popupVerification, setPopupVerification] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     idType: '',
+    idName: '',
     idNumber: '',
     idExpiry: '',
+    userDob: '',
     addressLine1: '',
     addressLine2: '',
     city: '',
@@ -83,7 +87,7 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
   const [message, setMessage] = useState<string | null>(null);
   const [showSubmissionPopup, setshowSubmissionPopup] = useState<boolean>(false);
 
-  const steps = ['Identity Verification', 'Address Verification', 'Upload Documents'];
+  const steps = ['Personal Information', 'Address Verification', 'Identity Verification', 'Document Verification', 'Selfie Verification'];
 
   // Fetch user verification data from Firestore
   useEffect(() => {
@@ -136,22 +140,28 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
     }
   };
 
+ 
+
   const validateStep = (): boolean => {
     const newErrors: Errors = {};
     if (currentStep === 0) {
-      if (!formData.idType) newErrors.idType = 'ID Type is required';
-      if (!formData.idNumber) newErrors.idNumber = 'ID Number is required';
-      if (!formData.idExpiry) newErrors.idExpiry = 'Expiry Date is required';
+      if (!formData.idName) newErrors.idName = 'Full Name is required';
+      if (!formData.userDob) newErrors.userDob = 'Date of Birth is required';
     } else if (currentStep === 1) {
       if (!formData.addressLine1) newErrors.addressLine1 = 'Address Line 1 is required';
       if (!formData.city) newErrors.city = 'City is required';
       if (!formData.state) newErrors.state = 'State/Province is required';
       if (!formData.postalCode) newErrors.postalCode = 'Postal Code is required';
       if (!formData.country) newErrors.country = 'Country is required';
-    } else if (currentStep === 2) {
+     } else if (currentStep === 2) {
+        if (!formData.idType) newErrors.idType = 'ID Type is required';
+        if (!formData.idName) newErrors.idNumber = 'ID Number is required';
+        if (!formData.idExpiry) newErrors.idExpiry = 'Expiry Date is required';
+    } else if (currentStep === 3) {
       if (!formData.idFront) newErrors.idFront = 'ID Front is required';
       if (!formData.idBack) newErrors.idBack = 'ID Back is required';
-      if (!formData.selfie) newErrors.selfie = 'Selfie is required';
+    }else if (currentStep === 4) {
+            if (!formData.selfie) newErrors.selfie = 'Selfie is required';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -198,9 +208,11 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
       await updateDoc(userRef, {
         popupVerification: true,
         verificationData: {
+          idName: formData.idName,
           idType: formData.idType,
           idNumber: formData.idNumber,
           idExpiry: formData.idExpiry,
+          userDob: formData.userDob,
           addressLine1: formData.addressLine1,
           addressLine2: formData.addressLine2,
           city: formData.city,
@@ -221,9 +233,11 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
       });
   
       setFormData({
+        idName: '',
         idType: '',
         idNumber: '',
         idExpiry: '',
+        userDob: '',
         addressLine1: '',
         addressLine2: '',
         city: '',
@@ -297,7 +311,7 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleVerificationSubmit} className="space-y-4">
-              {currentStep === 0 && (
+            {currentStep === 0 && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -305,47 +319,38 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
                   transition={{ duration: 0.3 }}
                 >
                   <div className="space-y-4">
+                  
                     <div>
-                      <Label htmlFor="idType" className="text-lg text-white">ID Type</Label>
-                      <Select name="idType" value={formData.idType} onValueChange={(value) => handleSelectChange('idType', value)}>
-                        <SelectTrigger id="idType" className="text-lg bg-gray-700 text-white border-gray-600">
-                          <SelectValue className="text-lg" placeholder="Select ID type" />
-                        </SelectTrigger>
-                        <SelectContent className="text-lg bg-gray-800 text-white border-gray-700">
-                          <SelectItem className="text-lg" value="passport">Passport</SelectItem>
-                          <SelectItem className="text-lg" value="driverLicense">Driver&apos;s License</SelectItem>
-                          <SelectItem className="text-lg" value="nationalId">National ID</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {errors.idType && <p className="text-red-500 text-sm mt-1">{errors.idType}</p>}
-                    </div>
-                    <div>
-                      <Label htmlFor="idNumber" className="text-lg text-white">ID Number</Label>
+                      <Label htmlFor="idName" className="text-lg text-white">Name</Label>
                       <Input
-                        id="idNumber"
-                        name="idNumber"
-                        value={formData.idNumber}
+                        id="idName"
+                        name="idName"
+                        value={formData.idName}
                         onChange={handleChange}
                         className="text-lg bg-gray-700 text-white border-gray-600"
-                        placeholder="Enter ID number"
+                        placeholder="Enter Full Name"
                       />
-                      {errors.idNumber && <p className="text-red-500 text-sm mt-1">{errors.idNumber}</p>}
+                      {errors.idName && <p className="text-red-500 text-sm mt-1">{errors.idName}</p>}
                     </div>
+                    
                     <div>
-                      <Label htmlFor="idExpiry" className="text-lg text-white">ID Expiry Date</Label>
+                      <Label htmlFor="userDob" className="text-lg text-white">Date of Birth</Label>
                       <Input
-                        id="idExpiry"
-                        name="idExpiry"
+                        id="userDob"
+                        name="userDob"
                         type="date"
-                        value={formData.idExpiry}
+                        value={formData.userDob}
                         onChange={handleChange}
                         className="text-lg bg-gray-700 text-white border-gray-600"
                       />
-                      {errors.idExpiry && <p className="text-red-500 text-sm mt-1">{errors.idExpiry}</p>}
+                      {errors.userDob && <p className="text-red-500 text-sm mt-1">{errors.userDob}</p>}
                     </div>
                   </div>
+                  
+                  
                 </motion.div>
               )}
+              
 
               {currentStep === 1 && (
                 <motion.div
@@ -435,6 +440,61 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
               )}
 
 {currentStep === 2 && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="idType" className="text-lg text-white">ID Type</Label>
+                      <Select name="idType" value={formData.idType} onValueChange={(value) => handleSelectChange('idType', value)}>
+                        <SelectTrigger id="idType" className="text-lg bg-gray-700 text-white border-gray-600">
+                          <SelectValue className="text-lg" placeholder="Select ID type" />
+                        </SelectTrigger>
+                        <SelectContent className="text-lg bg-gray-800 text-white border-gray-700">
+                          <SelectItem className="text-lg" value="passport">Passport</SelectItem>
+                          <SelectItem className="text-lg" value="driverLicense">Driver&apos;s License</SelectItem>
+                          <SelectItem className="text-lg" value="nationalId">National ID</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.idType && <p className="text-red-500 text-sm mt-1">{errors.idType}</p>}
+                    </div>
+
+                    <div>
+                      <Label htmlFor="idNumber" className="text-lg text-white">ID Number</Label>
+                      <Input
+                        id="idNumber"
+                        name="idNumber"
+                        value={formData.idNumber}
+                        onChange={handleChange}
+                        className="text-lg bg-gray-700 text-white border-gray-600"
+                        placeholder="Enter ID number"
+                      />
+                      {errors.idNumber && <p className="text-red-500 text-sm mt-1">{errors.idNumber}</p>}
+                    </div>
+                    <div>
+                      <Label htmlFor="idExpiry" className="text-lg text-white">ID Expiry Date</Label>
+                      <Input
+                        id="idExpiry"
+                        name="idExpiry"
+                        type="date"
+                        value={formData.idExpiry}
+                        onChange={handleChange}
+                        className="text-lg bg-gray-700 text-white border-gray-600"
+                      />
+                      {errors.idExpiry && <p className="text-red-500 text-sm mt-1">{errors.idExpiry}</p>}
+                    </div>
+
+                    
+                  </div>
+                  
+                  
+                </motion.div>
+              )}
+
+{currentStep === 3 && (
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -522,44 +582,60 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
               {errors.idBack && <p className="text-red-500 text-sm mt-1">{errors.idBack}</p>}
             </div>
 
-            {/* Upload Selfie */}
-            <div className="relative">
-  <Label htmlFor="selfie" className="text-lg text-white">Upload Selfie</Label>
-  <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-600 px-6 py-10 relative">
-    {/* Image Preview Positioned Behind */}
-    {previewUrls.selfie && (
-      <Image 
-        src={previewUrls.selfie} 
-        alt="Selfie Preview" 
-        className="absolute inset-0 h-full w-full object-cover rounded-lg opacity-40 z-0" // Centered image with transparency
-        width={500}
-        height={300}
-      />
-    )}
-    <div className="text-center z-10"> {/* Ensure content is above the image */}
-      <Upload className="mx-auto h-12 w-12 text-purple-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-purple-600 focus-within:ring-offset-2 hover:text-purple-500" />
-      <div className="pt-2 text-sm leading-6 text-gray-400">
-        <label
-          htmlFor="selfie"
-          className="text-center cursor-pointer rounded-md bg-gray-700 px-3 py-2 font-semibold text-white focus-within:outline-none focus-within:ring-2 focus-within:ring-purple-600 focus-within:ring-offset-2 hover:text-purple-500"
-        >
-          <span>Upload a file</span>
-          <input id="selfie" name="selfie" type="file" className="sr-only" onChange={handleFileChange} />
-        </label>
-        
-      </div >
-      <div className="pt-4">
-      <p className=" rounded-md bg-gray-600 px-3 py-2 text-base leading-5 text-white">or drag and drop <br /> PNG, JPG, GIF up to 10MB</p>
-      
-    </div>
-    </div>
-  </div>
-  {errors.selfie && <p className="text-red-500 text-sm mt-1">{errors.selfie}</p>}
-</div>
+           
 
           </div>
         </motion.div>
-              )}
+)}
+{currentStep === 4  && (
+  <motion.div
+    initial={{ opacity: 0, x: 20 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: -20 }}
+    transition={{ duration: 0.3 }}
+  >
+    <div className="space-y-4">
+      
+        
+
+      {/* Upload Selfie */}
+      <div className="relative">
+<Label htmlFor="selfie" className="text-lg text-white">Upload Selfie</Label>
+<div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-600 px-6 py-10 relative">
+{/* Image Preview Positioned Behind */}
+{previewUrls.selfie && (
+<Image 
+  src={previewUrls.selfie} 
+  alt="Selfie Preview" 
+  className="absolute inset-0 h-full w-full object-cover rounded-lg opacity-40 z-0" // Centered image with transparency
+  width={500}
+  height={300}
+/>
+)}
+<div className="text-center z-10"> {/* Ensure content is above the image */}
+<Upload className="mx-auto h-12 w-12 text-purple-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-purple-600 focus-within:ring-offset-2 hover:text-purple-500" />
+<div className="pt-2 text-sm leading-6 text-gray-400">
+  <label
+    htmlFor="selfie"
+    className="text-center cursor-pointer rounded-md bg-gray-700 px-3 py-2 font-semibold text-white focus-within:outline-none focus-within:ring-2 focus-within:ring-purple-600 focus-within:ring-offset-2 hover:text-purple-500"
+  >
+    <span>Upload a file</span>
+    <input id="selfie" name="selfie" type="file" className="sr-only" onChange={handleFileChange} />
+  </label>
+  
+</div >
+<div className="pt-4">
+<p className=" rounded-md bg-gray-600 px-3 py-2 text-base leading-5 text-white">or drag and drop <br /> PNG, JPG, GIF up to 10MB</p>
+
+</div>
+</div>
+</div>
+{errors.selfie && <p className="text-red-500 text-sm mt-1">{errors.selfie}</p>}
+</div>
+
+    </div>
+  </motion.div>
+)}
               {message && (
                 <div className="mt-4 text-center">
                   <p>{message}</p>

@@ -15,10 +15,8 @@ import { collection, addDoc, doc, getDoc } from 'firebase/firestore'; // Import 
 import Link from 'next/link';
 import { FaBitcoin, FaShieldAlt, FaWallet } from 'react-icons/fa';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { FiTrendingUp } from 'react-icons/fi';
 import { FaEthereum } from "react-icons/fa";
 import { SiDogecoin, SiTether } from "react-icons/si";
-import { LoaderCircle } from 'lucide-react';
 
 // type WithdrawProps = {
 //   setCurrentPage: (page: string) => void;
@@ -277,422 +275,99 @@ import { LoaderCircle } from 'lucide-react';
         <p className="pl-12 text-xl text-gray-400">Transfer your crypto to an external wallet</p>
       </div>
 
-      <div >
-        <motion.div >
-          <Card style={{ borderRadius: '2rem' }} className="mx-4 px-8 pb-12 w-auto bg-gray-100 bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Portfolio</CardTitle>
-              </CardHeader>
-
-
-              <div className="mx-4  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-12 mt-12">
-              {/* Balance Cards */}
-   <div >
-   {/* Total Balance Card */}
-   <motion.div
-    whileTap={{ scale: 0.98 }}
-    whileHover={{ scale: 1.05 }}
-    style={{
-      height: "210px",
-      width: "250px",
-      padding: "20px",
-      borderRadius: "1.5rem",
-      background: "linear-gradient(to bottom right, #7F00FF, #E100FF)",
-      boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
-    }}
-    className="text-white"
-  >
-    <h3 style={{ fontSize: "1.7rem", fontWeight: "600" }}>Total Balance</h3>
-    
-    <div
-    
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    marginTop: "1rem",
-  }}
->
-  <FaWallet style={{ fontSize: "1.5rem", color: "#fff" }}  />
-  <span
-    style={{
-      fontSize: "1.7rem",
-      fontWeight: "bold",
-      color: "#fff",
-    }}
-  >
-    ${calculateTotalBalance()}
-  </span>
-</div>
-
-    <p style={{ fontSize: "0.85rem", marginTop: "0.5rem", opacity: 0.8 }}>
-      Across all cryptocurrencies. <br />Rates may fluctuate based on market conditions</p>
-      
-    
-  </motion.div>     
-   </div>   
-{/* BTC Balance Card */}
-<motion.div
- whileTap={{ scale: 0.98 }}
-  whileHover={{ scale: 1.05 }}
-  style={{
-    height: "210px",
-    width: "250px",
-    padding: "20px",
-    borderRadius: "1.5rem",
-    background: "linear-gradient(to bottom right, #FF512F, #F09819)",
-    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
-  }}
-  className="text-black"
->
-  {/* Card Header */}
-  <div
+<div>
   
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    <h3 style={{ fontSize: "1.5rem", fontWeight: "600", color: "#fff" }}>
-      BTC  <br /> Balance
-    </h3>
-    <FiTrendingUp style={{ fontSize: "1.2rem", color: "#fff" }} />
-  </div>
+    <Card style={{ borderRadius: '2rem' }} className="mx-4 px-8 pb-12 bg-gray-800 border-gray-700">
+      <CardHeader>
+        <CardTitle className="text-3xl text-white">Portfolio</CardTitle>
+      </CardHeader>
 
-  {/* Balance Details */}
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "0.5rem",
-      marginTop: "1rem",
-    }}
-  >
-    <FaBitcoin style={{ fontSize: "1.5rem", color: "#FFD700" }} />
-    <span
-      style={{
-        fontSize: "1.7rem",
-        fontWeight: "bold",
-        color: "#fff",
-      }}
-    >
-      {btcBalance !== undefined ? `${btcBalance}` : "Loading..."}
-    </span>
-  </div>
-
- {/* USD Value */}
-<div style={{ fontSize: "1rem", color: "#fff", marginTop: "0.5rem" }}>
-  {cryptoRates.btc ? (
-    <p className="text-purple-200 text-sm">
-      ${(btcBalance ? (btcBalance * cryptoRates.btc).toFixed(2) : 0).toLocaleString()} USD
-    </p>
-  ) : (
-    <p className="text-purple-200 text-sm">Loading rate...</p>
-  )}
-</div>
-
-
-  {/* Rate */}
-  <p style={{ fontSize: "0.85rem", marginTop: "0.5rem", opacity: 0.8, color: "#fff" }}>
-    Rate: ${cryptoRates.btc.toFixed(2) || "Loading..."}
-  </p>
-</motion.div>
-
-
-{/* ETH Balance Card */}
-<motion.div
- whileTap={{ scale: 0.98 }}
-  whileHover={{ scale: 1.05 }}
-  style={{
-    height: "210px",
-    width: "250px",
-    padding: "20px",
-    borderRadius: "1.5rem",
-    background: "linear-gradient(to bottom right, #43C6AC, #191654)",
-    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
-  }}
-  className="text-black px-8"
->
-  {/* Card Header */}
-  <div
-  
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    <h3 style={{ fontSize: "1.5rem", fontWeight: "600", color: "#fff" }}>
-      ETH  <br /> Balance
-    </h3>
-    <FiTrendingUp style={{ fontSize: "1.2rem", color: "#fff" }} />
-  </div>
-
-  {/* Balance Details */}
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "0.5rem",
-      marginTop: "1rem",
-    }}
-  >
-    <FaEthereum  style={{ fontSize: "1.5rem", color: "#FFD700" }} />
-    <span
-      style={{
-        fontSize: "1.7rem",
-        fontWeight: "bold",
-        color: "#fff",
-      }}
-    >
-      {ethBalance !== undefined ? `${ethBalance}` : "Loading..."}
-    </span>
-  </div>
-
- {/* USD Value */}
-<div style={{ fontSize: "1rem", color: "#fff", marginTop: "0.5rem" }}>
-  {cryptoRates.btc ? (
-    <p className="text-purple-200 text-sm">
-      ${(ethBalance ? (ethBalance * cryptoRates.eth).toFixed(2) : 0).toLocaleString()} USD
-    </p>
-  ) : (
-    <p className="text-purple-200 text-sm">Loading rate...</p>
-  )}
-</div>
-
-
-  {/* Rate */}
-  <p style={{ fontSize: "0.85rem", marginTop: "0.5rem", opacity: 0.8, color: "#fff" }}>
-    Rate: ${cryptoRates.eth.toFixed(2) || "Loading..."}
-  </p>
-</motion.div>
-
-
-
-{/* DOGE Balance Card */}
-<motion.div
- whileTap={{ scale: 0.98 }}
-  whileHover={{ scale: 1.05 }}
-  style={{
-    height: "210px",
-    width: "250px",
-    padding: "20px",
-    borderRadius: "1.5rem",
-    background: "linear-gradient(to bottom right, #2193B0, #6DD5ED)",
-
-
-
-
-    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
-  }}
-  className="text-black"
->
-  {/* Card Header */}
-  <div
- 
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    <h3 style={{ fontSize: "1.5rem", fontWeight: "600", color: "#fff" }}>
-      DOGE <br /> Balance
-    </h3>
-    <FiTrendingUp style={{ fontSize: "1.2rem", color: "#fff" }} />
-  </div>
-
-  {/* Balance Details */}
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "0.5rem",
-      marginTop: "1rem",
-    }}
-  >
-    <SiDogecoin  style={{ fontSize: "1.5rem", color: "#FFD700" }} />
-    <span
-      style={{
-        fontSize: "1.7rem",
-        fontWeight: "bold",
-        color: "#fff",
-      }}
-    >
-      {dogeBalance !== undefined ? `${dogeBalance}` : "Loading..."}
-    </span>
-  </div>
-
- {/* USD Value */}
-<div style={{ fontSize: "1rem", color: "#fff", marginTop: "0.5rem" }}>
-  {cryptoRates.doge ? (
-    <p className="text-purple-200 text-sm">
-      ${(dogeBalance ? (dogeBalance * cryptoRates.doge).toFixed(2) : 0).toLocaleString()} USD
-    </p>
-  ) : (
-    <p className="text-purple-200 text-sm">Loading rate...</p>
-  )}
-</div>
-
-
-  {/* Rate */}
-  <p style={{ fontSize: "0.85rem", marginTop: "0.5rem", opacity: 0.8, color: "#fff" }}>
-    Rate: ${cryptoRates.doge.toFixed(2) || "Loading..."}
-  </p>
-</motion.div>
-
-{/* USDT Balance Card */}
-<motion.div
- whileTap={{ scale: 0.98 }}
-  whileHover={{ scale: 1.05 }}
-  style={{
-    height: "210px",
-    width: "250px",
-    padding: "20px",
-    borderRadius: "1.5rem",
-    background: "linear-gradient(to bottom right, #FF416C , #2196F3 )",
-    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
-  }}
-  className="text-black"
->
-  {/* Card Header */}
-  <div
-  
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    <h3 style={{ fontSize: "1.5rem", fontWeight: "600", color: "#fff" }}>
-      USDT  <br /> Balance
-    </h3>
-    <FiTrendingUp style={{ fontSize: "1.2rem", color: "#fff" }} />
-  </div>
-
-  {/* Balance Details */}
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "0.5rem",
-      marginTop: "1rem",
-    }}
-  >
-    <SiTether  style={{ fontSize: "1.5rem", color: "#FFD700" }} />
-    <span
-      style={{
-        fontSize: "1.7rem",
-        fontWeight: "bold",
-        color: "#fff",
-      }}
-    >
-      {usdtBalance !== undefined ? `${usdtBalance}` : "Loading..."}
-    </span>
-  </div>
-
- {/* USD Value */}
-<div style={{ fontSize: "1rem", color: "#fff", marginTop: "0.5rem" }}>
-  {cryptoRates.usdt ? (
-    <p className="text-purple-200 text-sm">
-      ${(usdtBalance ? (usdtBalance * cryptoRates.usdt).toFixed(2) : 0).toLocaleString()} USD
-    </p>
-  ) : (
-    <p className="text-purple-200 text-sm">Loading rate...</p>
-  )}
-</div>
-
-
-  {/* Rate */}
-  <p style={{ fontSize: "0.85rem", marginTop: "0.5rem", opacity: 0.8, color: "#fff" }}>
-    Rate: ${cryptoRates.usdt.toFixed(2) || "Loading..."}
-  </p>
-</motion.div>
-
-
-{/* Recovered Balance Card */}
-<motion.div
- whileTap={{ scale: 0.98 }}
-  whileHover={{ scale: 1.05 }}
-  style={{
-    height: "210px",
-    width: "250px",
-    padding: "20px",
-    borderRadius: "1.5rem",
-    background: "linear-gradient(to bottom right, #009E60, #4CAF50)",
-    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
-  }}
-  className="text-black"
->
-  {/* Card Header */}
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    <h3 style={{ fontSize: "1.5rem", fontWeight: "600", color: "#fff" }}>
-    Recovered  <br /> Balance
-    </h3>
-    <LoaderCircle style={{ fontSize: "1.2rem", color: "#fff" }} />
-  </div>
-
-  {/* Balance Details */}
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "0.5rem",
-      marginTop: "1rem",
-    }}
-  >
-    <FaShieldAlt     style={{ fontSize: "1.5rem", color: "#FFD700" }} />
-    <span
-      style={{
-        fontSize: "1.7rem",
-        fontWeight: "bold",
-        color: "#fff",
-      }}
-    >
-      {recBalance !== undefined ? `$ ${recBalance} ` : "Loading..."}
-    </span>
-  </div>
-
- {/* USD Value */}
-<div style={{ fontSize: "1rem", color: "#fff", marginTop: "0.5rem" }}>
-  
-    <p className="text-purple-200 text-sm">
-    This is your recovered balance from all lost transactions..
-    </p>
-  
-    <p className="text-purple-200 text-sm"></p>
-  
-</div>
-
-
-  {/* Rate */}
-  <p style={{ fontSize: "0.85rem", marginTop: "0.5rem", opacity: 0.8, color: "#fff" }}>
-    
-  </p>
-</motion.div>
-
-  
-  
-
-
-
-
-
-
-  
-     
-
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xxl:grid-cols-6 gap-6 mt-12">
+        {/* Balance Cards */}
+        {/* Each card */}
+        {[
+          {
+            title: "Total Balance",
+            gradient: "linear-gradient(to bottom right, #7F00FF, #E100FF)",
+            icon: <FaWallet style={{ fontSize: "1.5rem", color: "#fff" }} />,
+            value: `$${calculateTotalBalance()}`,
+            description: "Across all cryptocurrencies. Rates may fluctuate based on market conditions.",
+          },
+          {
+            title: "BTC Balance",
+            gradient: "linear-gradient(to bottom right, #FF512F, #F09819)",
+            icon: <FaBitcoin style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+            value: btcBalance ? `${btcBalance}` : "Loading...",
+            usdValue: cryptoRates.btc
+              ? `$${(btcBalance ? (btcBalance * cryptoRates.btc).toFixed(2) : 0).toLocaleString()} USD`
+              : "Loading rate...",
+            rate: cryptoRates.btc ? `$${cryptoRates.btc.toFixed(2)}` : "Loading...",
+          },
+          {
+            title: "ETH Balance",
+            gradient: "linear-gradient(to bottom right, #43C6AC, #191654)",
+            icon: <FaEthereum style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+            value: ethBalance ? `${ethBalance}` : "Loading...",
+            usdValue: cryptoRates.eth
+              ? `$${(ethBalance ? (ethBalance * cryptoRates.eth).toFixed(2) : 0).toLocaleString()} USD`
+              : "Loading rate...",
+            rate: cryptoRates.eth ? `$${cryptoRates.eth.toFixed(2)}` : "Loading...",
+          },
+          {
+            title: "DOGE Balance",
+            gradient: "linear-gradient(to bottom right, #2193B0, #6DD5ED)",
+            icon: <SiDogecoin style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+            value: dogeBalance ? `${dogeBalance}` : "Loading...",
+            usdValue: cryptoRates.doge
+              ? `$${(dogeBalance ? (dogeBalance * cryptoRates.doge).toFixed(2) : 0).toLocaleString()} USD`
+              : "Loading rate...",
+            rate: cryptoRates.doge ? `$${cryptoRates.doge.toFixed(2)}` : "Loading...",
+          },
+          {
+            title: "USDT Balance",
+            gradient: "linear-gradient(to bottom right, #FF416C , #2196F3 )",
+            icon: <SiTether style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+            value: usdtBalance ? `${usdtBalance}` : "Loading...",
+            usdValue: cryptoRates.usdt
+              ? `$${(usdtBalance ? (usdtBalance * cryptoRates.usdt).toFixed(2) : 0).toLocaleString()} USD`
+              : "Loading rate...",
+            rate: cryptoRates.usdt ? `$${cryptoRates.usdt.toFixed(2)}` : "Loading...",
+          },
+          {
+            title: "Recovered Balance",
+            gradient: "linear-gradient(to bottom right, #009E60, #4CAF50)",
+            icon: <FaShieldAlt style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+            value: recBalance ? `$${recBalance}` : "Loading...",
+            description: "This is your recovered balance from all lost transactions.",
+          },
+        ].map((card, index) => (
+          <motion.div
+            key={index}
+            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.05 }}
+            style={{
+              padding: "20px",
+              borderRadius: "1.5rem",
+              background: card.gradient, // Use the custom gradient directly here
+              boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
+            }}
+            className="text-white flex flex-col items-start"
+          >
+            <div className="flex justify-between w-full items-center">
+              <h3 style={{ fontSize: "1.5rem", fontWeight: "600" }}>{card.title}</h3>
+              {card.icon}
             </div>
-          </Card>
-        </motion.div>
+            <span style={{ fontSize: "1.7rem", fontWeight: "bold", marginTop: "1rem" }}>{card.value}</span>
+            {card.usdValue && <p className="text-sm text-purple-200 mt-1">{card.usdValue}</p>}
+            {card.rate && <p className="text-xs opacity-80 mt-1">Rate: {card.rate}</p>}
+            {card.description && <p className="text-xs opacity-80 mt-1">{card.description}</p>}
+          </motion.div>
+        ))}
       </div>
+    </Card>
+  
+</div>
+
 
       <div  style={{ marginBottom: '150px', borderRadius: '2rem' }} className="py-4 mx-4 flex items-center justify-center bg-gray-800 border border-gray-700"> {/* Full-height centering container with gray background */}
       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -749,7 +424,7 @@ import { LoaderCircle } from 'lucide-react';
           onChange={handleChange}
           className="text-lg  bg-gray-700 text-white border border-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           style={{ appearance: "none", borderRadius: '0.5rem' }}
-          min="0"
+          min="1000"
           max={calculateTotalBalance()}
           step="0.01"
         />

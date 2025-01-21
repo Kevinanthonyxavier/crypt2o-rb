@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { MoonIcon, SunIcon } from 'lucide-react'
+import {  MoonIcon, SunIcon } from 'lucide-react'
 import LoginModal from './LoginModal'
 import RegisterModal from './RegisterModal'
 
@@ -30,6 +30,7 @@ export default function Header() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="text-3xl font-extrabold"
+          
         >
           <motion.span
             animate={{
@@ -43,7 +44,8 @@ export default function Header() {
             }}
             className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600"
           >
-            Crypto-Bank
+            
+            Crypt2o.com
           </motion.span>
         </motion.div>
         <nav className="hidden md:flex space-x-4">

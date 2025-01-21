@@ -109,9 +109,9 @@ export default function AffiliateDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Input value="https://crypto-bank.com/?ref=your_unique_id" readOnly />
+                <Input value="https://crypt2o.com.com/?ref=your_unique_id" readOnly />
                 <Button
-                  onClick={() => copyToClipboard("https://crypto-bank.com/?ref=your_unique_id")}
+                  onClick={() => copyToClipboard("https://crypt2o.com.com/?ref=your_unique_id")}
                   size="icon"
                 >
                   <CopyIcon className="h-4 w-4" />
@@ -179,14 +179,14 @@ export default function AffiliateDashboard() {
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span>Join Crypto-Bank today!</span>
-                      <Button size="sm" onClick={() => copyToClipboard("Join Crypto-Bank today!")}>
+                      <span>Join Crypt2o.com today!</span>
+                      <Button size="sm" onClick={() => copyToClipboard("Join Crypt2o.com today!")}>
                         <CopyIcon className="h-4 w-4" />
                       </Button>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>Earn interest on your crypto with Crypto-Bank</span>
-                      <Button size="sm" onClick={() => copyToClipboard("Earn interest on your crypto with Crypto-Bank")}>
+                      <span>Earn interest on your crypto with Crypt2o.com</span>
+                      <Button size="sm" onClick={() => copyToClipboard("Earn interest on your crypto with Crypt2o.com")}>
                         <CopyIcon className="h-4 w-4" />
                       </Button>
                     </div>

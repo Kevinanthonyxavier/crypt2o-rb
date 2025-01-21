@@ -262,7 +262,7 @@ const LoginPage: React.FC = () => {
   
       toast({
         title: 'Login Successful',
-        description: 'Welcome to Crypto-Bank!',
+        description: 'Welcome to Crypt2o.com!',
         variant: 'default',
       });
   
@@ -334,7 +334,7 @@ const LoginPage: React.FC = () => {
         <Card className="w-[400px] bg-black bg-opacity-30 backdrop-blur-lg border-white border-opacity-20">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-              Crypto-Bank
+            Crypt2o.com
             </CardTitle>
           </CardHeader>
           <CardContent>

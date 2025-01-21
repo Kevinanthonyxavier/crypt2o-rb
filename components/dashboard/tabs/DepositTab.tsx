@@ -380,7 +380,7 @@ if (method === "Bank") {
       <div className="space-y-6">
         
           <h2 className="pl-8 text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">Deposit Funds</h2>
-          <p className="pl-12 text-xl text-gray-400">Add funds to your Crypto-Bank account</p>
+          <p className="pl-12 text-xl text-gray-400">Add funds to your Crypt2o.com account</p>
         </div>
       
 

@@ -29,14 +29,18 @@ import {
 } from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { db } from '@/lib/firebase' // Adjust the path as necessary
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, getDocs, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth'; // Import Firebase Auth
 import TawkMessengerReact from "@tawk.to/tawk-messenger-react";
+import { showToast } from '@/utils/toast';
+
+
 // Types
 type SupportTicketForm = {
   subject: string;
   message: string;
   email: string;
+  name: string;
 }
 
 
@@ -111,7 +115,7 @@ const SupportChannels: React.FC<{ onLiveChat: () => void; className?: string; co
 // Main Support Center Component
 const SupportCenter: React.FC = () => {
 
-  const [contactInfo, setContactInfo] = useState<{ phone: string; email: string } | null>(null);
+  const [contactInfo, setContactInfo] = useState<{ phone: string; email: string; } | null>(null);
   
 
  
@@ -121,6 +125,19 @@ const SupportCenter: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false); // New state for submission
+  // const [supportTicketForm, setSupportTicketForm] = useState<SupportTicketForm>({
+  //   subject: '',
+  //   message: '',
+  //   email: '',
+  // });
+
+  const [supportTicketForm, setSupportTicketForm] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+  
 
   
     const [faqItems, setFaqItems] = useState<FAQItem[]>([]);
@@ -140,6 +157,7 @@ const SupportCenter: React.FC = () => {
             setContactInfo({
               phone: contactData[0].phone,
               email: contactData[0].email,
+              
             });
           }
         } catch (error) {
@@ -182,19 +200,24 @@ const SupportCenter: React.FC = () => {
       setSupportTicketForm((prev) => ({
         ...prev,
         email: user.email || '', // Set the email from the current user
+        name: user.displayName  || '',
       }));
     }
   }, []);
 
+  
+
 
   // Support Ticket Form State
-  const [supportTicketForm, setSupportTicketForm] = useState<SupportTicketForm>({
-    subject: '',
-    message: '',
-    email: '',
-  });
+  // const [supportTicketForm, setSupportTicketForm] = useState<SupportTicketForm>({
+  //   subject: '',
+  //   message: '',
+  //   email: '',
+  // });
 
   const [isEmailVisible, ] = useState(false); // Default to true to show the email field
+  const [isNameVisible, ] = useState(false); // Default to true to show the email field
+
 
   // Form Validation Errors
   const [formErrors, setFormErrors] = useState<Partial<SupportTicketForm>>({});
@@ -215,6 +238,9 @@ const SupportCenter: React.FC = () => {
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supportTicketForm.email)) {
       errors.email = 'Valid email is required';
     }
+    if (!supportTicketForm.name.trim()) {
+      errors.name = 'Name is required';
+    }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -230,22 +256,24 @@ const SupportCenter: React.FC = () => {
   
     try {
       // Add a new ticket to the "tickets" collection
-      const docRef = await addDoc(collection(db, 'tickets'), {
-        email: supportTicketForm.email,
-        subject: supportTicketForm.subject,
-        message: supportTicketForm.message,
-        createdAt: new Date(),
+      await addDoc(collection(db, 'tickets'), {
+        ...supportTicketForm,
+        createdAt: serverTimestamp(),
       });
   
-      console.log("Document written with ID: ", docRef.id);
-      showToast("Support Ticket Submitted! Our team will respond within 24-48 hours.");
+      showToast({ title: 'Success', description: 'Support Ticket Submitted! Our team will respond within 24-48 hours.', variant: 'success' });
+
   
       // Reset form after successful submission
-      setSupportTicketForm({ subject: '', message: '', email: '' });
-      setFormErrors({});
+      setSupportTicketForm((prev) => ({
+        ...prev,
+        subject: '',
+        message: '',
+      }));
+     // setFormErrors({});
     } catch (error) {
       console.error("Error adding document: ", error);
-      showToast("Unable to submit support ticket. Please try again.");
+      showToast({ title: 'Error', description: 'Failed to submit ticket', variant: 'error' });
     } finally {
       setIsSubmitting(false); // Ensure the loading state is reset
     }
@@ -261,17 +289,17 @@ const SupportCenter: React.FC = () => {
   //   toast.success(message); // Or toast.error(), toast.info() based on use case
   // };
 
-  const showToast = (message: string) => {
-    showToast(message); // Show the toast notification
-  };
+  // const showToast = (message: string) => {
+  //   showToast(message); // Show the toast notification
+  // };
 
   return (
-    <TabsContent value="support" className="overflow-y-auto max-h-screen p-8 pb-32">
+    <TabsContent value="support" className="p-8 pb-32">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="overflow-y-auto max-h-100  rounded container mx-auto px-4 py-8 mb-8"
+        className="container mx-auto"
       >
         {/* Support Title */}
         <motion.h1
@@ -320,9 +348,9 @@ const SupportCenter: React.FC = () => {
       </CardHeader>
       <CardContent className="max-h-64 overflow-y-auto">
         {loading ? (
-          <div>Loading FAQs...</div>
+          <div className='text-white text-lg'>Loading FAQs...</div>
         ) : faqItems.length === 0 ? (
-          <div>No FAQs available.</div>
+          <div className='text-white text-lg'>No FAQs available.</div>
         ) : (
           <div className="space-y-4">
             {filteredFAQs.map((item) => (
@@ -332,7 +360,9 @@ const SupportCenter: React.FC = () => {
                 className="text-white text-lg w-full justify-between"
                 onClick={() => {
                   console.log('Button clicked:', item.question); // Debugging line
-                  showToast(`Answer: ${item.answer}`); // Display answer in a toast notification
+                 
+                  showToast({ title: 'Answer',  description: ` ${item.answer}`,
+                     variant: 'default' });
                 }}
               >
                 {item.question}
@@ -344,7 +374,7 @@ const SupportCenter: React.FC = () => {
       </CardContent>
     </Card>
   </motion.div>
-  <ToastContainer
+  {/* <ToastContainer
     // toastOptions={{
     //   position: 'top-center', // Centralize notifications
     //   style: {
@@ -353,7 +383,7 @@ const SupportCenter: React.FC = () => {
     //     color: '#FFFFFF', // Ensure text visibility
     //   },
     // }}
-  />
+  /> */}
 
 
 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -366,6 +396,30 @@ const SupportCenter: React.FC = () => {
             </CardHeader>
             <CardContent className="max-h-100 overflow-y-auto">
               <form onSubmit={handleSupportTicketSubmit} className="space-y-4 ">
+              {isNameVisible && (
+                  <div className="space-y-2 ">
+                    <Label htmlFor="support-name">Name</Label>
+                    <Input
+                      id="support-name"
+                      placeholder="Your name"
+                      value={supportTicketForm.name}
+                      onChange={(e) => setSupportTicketForm({
+                        ...supportTicketForm, 
+                        name: e.target.value
+                      })}
+                      className={`
+                         text-base text-white 
+                        bg-white bg-opacity-10 
+                        border-white border-opacity-20 py-2
+                        ${formErrors.name ? 'border-red-500' : ''}
+                      `}
+                    />
+                    {formErrors.name && (
+                      <p className="text-red-500 text-sm">{formErrors.name}</p>
+                    )}
+                  </div>
+                )}
+
                 {isEmailVisible && (
                   <div className="space-y-2 ">
                     <Label htmlFor="support-email">Email</Label>
@@ -389,29 +443,45 @@ const SupportCenter: React.FC = () => {
                     )}
                   </div>
                 )}
-                <div className="space-y-2 ">
-                  <Label className="text-lg text-white"  htmlFor="support-subject">Subject</Label>
-                  <Input
-                    id="support-subject"
-                    placeholder="Enter the subject of your inquiry"
-                    value={supportTicketForm.subject}
-                    onChange={(e) => setSupportTicketForm({
-                      ...supportTicketForm, 
-                      subject: e.target.value
-                    })}
-                    className={`
-                     text-base text-white 
-                      bg-white bg-opacity-10 
-                      border-white border-opacity-20 
-                      placeholder-gray-400 
-                      focus:placeholder-purple-300 
-                      ${formErrors.message ? 'border-red-500' : ''}
-                    `}
-                  />
-                  {formErrors.subject && (
-                    <p className="text-red-500 text-sm">{formErrors.subject}</p>
-                  )}
-                </div>
+                <div className="space-y-2 flex flex-col">
+  <Label className="text-lg text-white" htmlFor="support-subject">
+    Subject
+  </Label>
+  <select
+    id="support-subject"
+    value={supportTicketForm.subject}
+    onChange={(e) =>
+      setSupportTicketForm({
+        ...supportTicketForm,
+        subject: e.target.value,
+      })
+    }
+    className={`
+      text-base text-white 
+            bg-gray-800 
+         border border-purple-300  // Light purple border by default
+
+      border-gray-400   
+      placeholder-gray-400 
+       py-2 px-3 rounded 
+        focus:ring-2 focus:ring-purple-500
+        focus:outline-purple-500
+      ${formErrors.subject ? 'border-red-500' : ''}
+    `}
+  >
+   <option value="" disabled style={{ color: '#a855f7' }}>
+      Select the Type of inquiry
+    </option>
+    <option value="Account Issue" >Account Issue</option>
+    <option value="Withdraw Issue">Withdraw Issue</option>
+    <option value="Verification Issue">Verification Issue</option>
+    <option value="Others">Others</option>
+  </select>
+  {formErrors.subject && (
+    <p className="text-red-500 text-sm">{formErrors.subject}</p>
+  )}
+</div>
+
                 <div className="space-y-2">
                   <Label className="text-lg text-white " htmlFor="support-message">Message</Label>
                   <Textarea
@@ -437,8 +507,9 @@ const SupportCenter: React.FC = () => {
                     <p className="text-red-500 text-sm">{formErrors.message}</p>
                   )}
                 </div>
-                <Button type="submit" className="text-lg w-full hover:bg-purple-600 text-white" disabled={isSubmitting}>
+                <Button type="submit" className="text-lg w-full bg-purple-500 hover:bg-purple-600 text-white" disabled={isSubmitting}>
   <Send className="mr-2 h-4 w-4" /> {isSubmitting ? 'Submitting...' : 'Submit Ticket'}
+
 </Button>
               </form>
             </CardContent>
@@ -461,7 +532,7 @@ const SupportCenter: React.FC = () => {
           </CardHeader>
           <CardContent>
           {loading ? (
-          <p className="text-white">Loading FAQs...</p>
+          <p className="text-purple600 text-lg">Loading FAQs...</p>
         ) : faqItems.length === 0 ? (
           <p className="text-white">No FAQs available at the moment. Please check back later.</p>
         ) : (
@@ -489,8 +560,13 @@ const SupportCenter: React.FC = () => {
             <TawkMessengerReact propertyId="64b66b5d94cf5d49dc644d65" widgetId="1h5k96q8t" />
           </DialogContent>
         </Dialog>
+
+       {/* Toast Notifications */}
+       <ToastContainer />
       </motion.div>
     </TabsContent>
+
+    
   );
 }
 

@@ -328,7 +328,7 @@ const RegisterPage: React.FC = () => {
         // Show success notification
         toast({
           title: "Registration Successful",
-          description: `Welcome to Crypto-Bank, ${registerForm.firstName}!`,
+          description: `Welcome to Crypt2o.com, ${registerForm.firstName}!`,
           variant: "default",
         });
     
@@ -386,7 +386,7 @@ const RegisterPage: React.FC = () => {
             <CardTitle 
               className="text-3xl font-bold mb-2 bg-clip-text text-purple-500"
             >
-              Crypto-Bank
+              Crypt2o.com
             </CardTitle>
             <CardDescription className="text-white text-opacity-80">
               Create your account

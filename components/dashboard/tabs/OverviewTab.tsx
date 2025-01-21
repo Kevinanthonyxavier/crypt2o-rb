@@ -167,7 +167,7 @@ const OverviewTab: React.FC = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            Welcome to Crypto-Bank
+            Welcome to Crypt2o.com
           </motion.h1>
           <motion.div
             className="flex items-center mt-2"

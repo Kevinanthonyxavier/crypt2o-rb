@@ -16,13 +16,14 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { collection, query, where, getDocs, Timestamp } from "firebase/firestore"; 
+import { collection, query, where, getDocs, Timestamp, setDoc, doc, getDoc } from "firebase/firestore"; 
 import { onAuthStateChanged } from "firebase/auth"; 
 import { db, auth } from "@/lib/firebase"; 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTitle, DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { format } from 'date-fns';
+import { showToast } from "@/utils/toast";
 
 interface Trade {
   id: string;
@@ -47,6 +48,8 @@ const TradeTab: React.FC = () => {
   const [tradeType, setTradeType] = useState<'buy' | 'sell'>('buy');
   const [showTradePopup, setShowTradePopup] = useState(false);
   const [loadingg, setLoadingg] = useState<boolean>(true);
+  const [aiToggle, setAiToggle] = useState(false);
+  const [canToggle, ] = useState(false)
 
 
   // Fetch current user and their trades
@@ -103,6 +106,54 @@ const TradeTab: React.FC = () => {
     }
   };
 
+  //
+
+  useEffect(() => {
+    const fetchAIToggleStatus = async () => {
+      const user = auth.currentUser;
+  
+      if (user) {
+        const statusDocRef = doc(db, "users", user.uid, );
+  
+        try {
+          const docSnap = await getDoc(statusDocRef);
+  
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setAiToggle(data.isAIActive || false);
+          } else {
+            setAiToggle(false);
+          }
+        } catch (error) {
+          console.error("Failed to fetch AI trading status:", error);
+        }
+      }
+    };
+  
+    fetchAIToggleStatus();
+  }, []);
+  
+  const handleAIToggle = async () => {
+    const newStatus = !aiToggle;
+    setAiToggle(newStatus);
+    const user = auth.currentUser;
+  
+    if (user) {
+      const statusDocRef = doc(db, "users", user.uid, );
+  
+      try {
+        await setDoc(statusDocRef, { isAIActive: newStatus }, { merge: true });
+        showToast({
+          title: "Success",
+          description: `AI Trading ${newStatus ? "enabled" : "disabled"}.`,
+          variant: "success",
+        });
+      } catch (error) {
+        console.error("Failed to update AI trading status:", error);
+      }
+    }
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -110,10 +161,43 @@ const TradeTab: React.FC = () => {
       exit={{ opacity: 0 }}
       className="space-y-6"
     >
-      <div className="space-y-6">
-        <h2 className="pl-8 text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">Trade Cryptocurrencies</h2>
-        <p className="pl-12 text-xl text-gray-400">Buy and sell cryptocurrencies instantly</p>
-      </div>
+       <div className="space-y-6 flex items-center justify-between">
+  <div>
+    <h2 className="pl-8 text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+      Trade Cryptocurrencies
+    </h2>
+    <p className="pl-12 text-xl text-gray-400">
+      Buy and sell cryptocurrencies instantly
+    </p>
+  </div>
+
+  <div className="flex space-x-4 pr-8">
+    
+
+   {/* AI Trading Toggle */}
+<button
+  onClick={() => {
+    if (!canToggle) {
+      showToast({
+        title: "Action Disabled",
+        description: "AI Trading toggle is currently disabled. Please try again later.",
+        variant: "default",
+      });
+    } else {
+      handleAIToggle();
+    }
+  }}
+  disabled={!canToggle}
+  className={`px-4 py-2 text-lg font-medium rounded-lg transition-colors duration-200 ${
+    aiToggle
+      ? 'bg-blue-500 text-white'
+      : 'bg-gray-600 text-gray-200'
+  } ${!canToggle ? 'cursor-not-allowed opacity-50' : ''}`}
+>
+  {aiToggle ? 'AI Trading On' : 'AI Trading Off'}
+</button>
+  </div>
+</div>
 
       <div  style={{ borderRadius: '2rem' }} className="py-4 mx-12 flex items-center justify-center bg-gray-800 border border-gray-700"> {/* Full-height centering container with gray background */}
       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -275,7 +359,7 @@ const TradeTab: React.FC = () => {
     <DialogHeader>
       <DialogTitle>Trade Execution Restricted</DialogTitle>
     </DialogHeader>
-    <p>You are not allowed to execute trades at this time.</p>
+    <p>AI Trading is turned on.</p>
     <DialogFooter>
       <Button style={{ borderRadius: '0.5rem' }} onClick={() => setShowTradePopup(false)} className="bg-purple-500 hover:bg-purple-600">Close</Button>
     </DialogFooter>

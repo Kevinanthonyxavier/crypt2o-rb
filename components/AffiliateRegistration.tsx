@@ -81,7 +81,7 @@ export default function AffiliateRegistration({ isOpen, onClose }: AffiliateRegi
           {!showOtpInput ? (
             <>
               <p className="text-gray-300 mb-6 text-center">
-                Join the Crypto-Bank affiliate program and earn rewards for referring new customers.
+                Join the Crypt2o.com affiliate program and earn rewards for referring new customers.
               </p>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -208,7 +208,7 @@ export default function AffiliateRegistration({ isOpen, onClose }: AffiliateRegi
                     onChange={handleInputChange}
                     required
                     className="bg-gray-700 border-gray-600 text-white h-24"
-                    placeholder="Describe how you plan to drive traffic to Crypto-Bank (e.g., blog, YouTube channel, email list)"
+                    placeholder="Describe how you plan to drive traffic to Crypt2o.com (e.g., blog, YouTube channel, email list)"
                   />
                 </div>
                 <div className="flex items-center space-x-2">

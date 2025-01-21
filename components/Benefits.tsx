@@ -64,7 +64,7 @@ export default function Benefits() {
           transition={{ duration: 0.5 }}
           className="text-4xl font-bold mb-12 text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600"
         >
-          Why Choose Crypto-Bank?
+          Why Choose Crypt2o.com?
         </motion.h2>
         <motion.div
           variants={containerVariants}

@@ -5,14 +5,10 @@ import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSearchParams } from 'next/navigation';
 import { 
-  Home as HomeIcon, 
-  PieChart as PieChartIcon, 
-  ArrowUp as ArrowUpIcon, 
-  ArrowDown as ArrowDownIcon, 
+  
   DollarSign as DollarSignIcon, 
   User as UserIcon, 
-  Shield as ShieldIcon, 
-  Lock as LockIcon, 
+  
   HelpCircle as HelpCircleIcon 
 } from 'lucide-react';
 
@@ -28,6 +24,12 @@ import { auth, db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import WithdrawTab from './tabs/WithdrawTab';
 import OverviewTab from './tabs/OverviewTab';
+import { RxDashboard } from "react-icons/rx";
+import { IoTrendingUp } from "react-icons/io5";
+import { FiActivity } from "react-icons/fi";
+import { BsBank2 } from "react-icons/bs";
+import { MdVerifiedUser } from "react-icons/md";
+import { CgCompressRight } from "react-icons/cg";
 
 type IconMapping = {
   [key: string]: React.ComponentType<{ className?: string }>
@@ -87,26 +89,26 @@ const DashboardTabs: React.FC = () => {
   if (!isClient || loading) return <div>Loading...</div>; // Show loading state
 
   const iconMap: IconMapping = {
-    Home: HomeIcon,
-    PieChart: PieChartIcon,
-    ArrowUp: ArrowUpIcon,
-    ArrowDown: ArrowDownIcon,
+    RxDashboard: RxDashboard,
+    IoTrendingUp: IoTrendingUp,
+    FiActivity: FiActivity,
+    CgCompressRight: CgCompressRight,
+    BsBank2: BsBank2,
     DollarSign: DollarSignIcon,
     User: UserIcon,
-    Shield: ShieldIcon,
-    Lock: LockIcon,
+    MdVerifiedUser: MdVerifiedUser,
     HelpCircle: HelpCircleIcon
   };
 
   const tabConfig: TabConfig[] = [
-    { value: 'overview', name: 'Overview', icon: 'ArrowUp', component: OverviewTab },
-    { value: 'trade', name: 'Trade', icon: 'ArrowUp', component: TradeTab },
-    { value: 'transactions', name: 'Transactions', icon: 'ArrowUp', component: TransactionsTab },
-    { value: 'crypto-recovery', name: 'Crypto Recovery', icon: 'Lock', component: CryptoRecoveryTab },
-    { value: 'withdrawl', name: 'Withdrawl', icon: 'Lock', component: WithdrawTab },
+    { value: 'overview', name: 'Overview', icon: 'RxDashboard', component: OverviewTab },
+    { value: 'trade', name: 'Trade', icon: 'IoTrendingUp', component: TradeTab },
+    { value: 'transactions', name: 'Transactions', icon: 'FiActivity', component: TransactionsTab },
+    { value: 'crypto-recovery', name: 'Crypto Recovery', icon: 'CgCompressRight', component: CryptoRecoveryTab },
+    { value: 'withdraw', name: 'Withdraw', icon: 'BsBank2', component: WithdrawTab },
     { value: 'deposit', name: 'Deposit', icon: 'DollarSign', component: DepositTab },
-    { value: 'profile', name: 'Profile', icon: 'User ', component: ProfileTab },
-    { value: 'verification', name: 'Verification', icon: 'Shield', component: VerificationTab },
+    { value: 'profile', name: 'Profile', icon: 'User', component: ProfileTab },
+    { value: 'verification', name: 'Verification', icon: 'MdVerifiedUser', component: VerificationTab },
     { value: 'support', name: 'Support', icon: 'HelpCircle', component: SupportTab }
   ];
 
@@ -125,7 +127,7 @@ const DashboardTabs: React.FC = () => {
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="data-[state=active]:bg-white data-[state=active]:bg-opacity-20 text-white data-[state=active]:text-white"
+                className="data-[state=active]:bg-purple-400 data-[state=active]: text-white data-[state=active]:text-white"
               >
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
@@ -157,7 +159,7 @@ const DashboardTabs: React.FC = () => {
           Current URL: <code>{typeof window !== 'undefined' ? window.location.href : ''}</code>
         </span>
         <p className="text-white mt-2">
-          Copyright © 2012 - 2024 Crypto-Bank®. All rights reserved.
+          Copyright © 2012 - 2024 CCrypt2o.com®. All rights reserved.
         </p>
       </div>*/}
     </div> 

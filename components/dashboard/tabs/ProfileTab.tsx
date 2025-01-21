@@ -169,7 +169,7 @@ const UserProfile: React.FC = () => {
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}
-    className="space-y-6"
+    className="container  space-y-6"
   >
     <div className="space-y-6">
       <h2 className="pl-8 text-4xl  font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">Profile</h2>
@@ -181,8 +181,8 @@ const UserProfile: React.FC = () => {
         <Card
           // Maintain margin and border-radius
           
-          className="mx-8 w-auto sm:w-[500px] sm:w-py-8 md:w-[500px] lg:w-[600px]  h-auto  bg-gray-800 card-no-border" // Use the same gray color for the card
-        >
+          className="mx-8 w-auto sm:w-[500px] md:w-[500px] lg:w-[600px] h-auto bg-gray-800 card-no-border">
+        
           <div className="  items-center justify-center w-[800] py-8"> {/* Centering content */}
             <CardHeader className="w-full text-center">
             <CardTitle className=" text-3xl  text-white">Hi {userData?.name || ''},</CardTitle>

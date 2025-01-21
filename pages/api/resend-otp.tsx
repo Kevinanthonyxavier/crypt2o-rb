@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: email,
-        subject: 'Your New OTP for Crypto-Bank',
+        subject: 'Your New OTP for Crypt2o.com',
         text: `Your new OTP is: ${otp}. It will expire in 5 minutes.`,
       });
   

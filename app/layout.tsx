@@ -19,7 +19,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Crypto-Bank",
+  title: "Crypt2o.com",
   description: "Best Crypto Banking",
 };
 
