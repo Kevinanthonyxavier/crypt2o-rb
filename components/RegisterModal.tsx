@@ -321,7 +321,18 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
       }
     };
 ///
+const [windowWidth, setWindowWidth] = useState(0);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setWindowWidth(window.innerWidth);
+
+      const handleResize = () => setWindowWidth(window.innerWidth);
+      window.addEventListener("resize", handleResize);
+
+      return () => window.removeEventListener("resize", handleResize);
+    }
+  }, []);
   return (
 <div>
     
@@ -331,11 +342,11 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
         
         <DialogHeader>
         <div
-  className="h-48"
-  style={{
-    height: window.innerWidth > 768 ? '0px' : '2rem', // 768px is the `md` breakpoint in Tailwind
-  }}
-></div>
+      className="h-48"
+      style={{
+        height: windowWidth > 768 ? "0px" : "2rem", // ✅ Now it only runs on the client
+      }}
+    ></div>
           
           <DialogTitle className="text-2xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
             {showOtpInput ? 'Verify Your Email' : 'Create a Crypt2o.com Account'}
@@ -585,11 +596,11 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
           </Button>
         </form>
         <div
-  className="h-48"
-  style={{
-    height: window.innerWidth > 768 ? '0px' : '16rem', // 768px is the `md` breakpoint in Tailwind
-  }}
-></div>
+      className="h-48"
+      style={{
+        height: windowWidth > 768 ? "0px" : "2rem", // ✅ Now it only runs on the client
+      }}
+    ></div>
 
       </DialogContent>
     </Dialog>
