@@ -14,16 +14,15 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { collection, query, where, getDocs, Timestamp, setDoc, doc, getDoc } from "firebase/firestore"; 
+import { collection, query, where, getDocs, Timestamp, doc, getDoc } from "firebase/firestore"; 
 import { onAuthStateChanged } from "firebase/auth"; 
 import { db, auth } from "@/lib/firebase"; 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTitle, DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { format } from 'date-fns';
-import { showToast } from "@/utils/toast";
+//import { showToast } from "@/utils/toast";
 
 interface Trade {
   id: string;
@@ -50,6 +49,7 @@ const TradeTab: React.FC = () => {
   const [loadingg, setLoadingg] = useState<boolean>(true);
   const [aiToggle, setAiToggle] = useState(false);
   const [canToggle, ] = useState(false)
+  const [showPopup, setShowPopup] = useState(false);
 
 
   // Fetch current user and their trades
@@ -133,228 +133,231 @@ const TradeTab: React.FC = () => {
     fetchAIToggleStatus();
   }, []);
   
-  const handleAIToggle = async () => {
-    const newStatus = !aiToggle;
-    setAiToggle(newStatus);
-    const user = auth.currentUser;
+  // const handleAIToggle = async () => {
+  //   const newStatus = !aiToggle;
+  //   setAiToggle(newStatus);
+  //   const user = auth.currentUser;
   
-    if (user) {
-      const statusDocRef = doc(db, "users", user.uid, );
+  //   if (user) {
+  //     const statusDocRef = doc(db, "users", user.uid, );
   
-      try {
-        await setDoc(statusDocRef, { isAIActive: newStatus }, { merge: true });
-        showToast({
-          title: "Success",
-          description: `AI Trading ${newStatus ? "enabled" : "disabled"}.`,
-          variant: "success",
-        });
-      } catch (error) {
-        console.error("Failed to update AI trading status:", error);
-      }
-    }
-  };
+  //     try {
+  //       await setDoc(statusDocRef, { isAIActive: newStatus }, { merge: true });
+  //       showToast({
+  //         title: "Success",
+  //         description: `AI Trading ${newStatus ? "enabled" : "disabled"}.`,
+  //         variant: "success",
+  //       });
+  //     } catch (error) {
+  //       console.error("Failed to update AI trading status:", error);
+  //     }
+  //   }
+  // };
+
+  
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="space-y-6"
+      className="space-y-6 px-4 sm:px-6"
     >
-       <div className="space-y-6 flex items-center justify-between">
-  <div>
-    <h2 className="pl-8 text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-      Trade Cryptocurrencies
-    </h2>
-    <p className="pl-12 text-xl text-gray-400">
-      Buy and sell cryptocurrencies instantly
-    </p>
-  </div>
+      {/* Header */}
+      <div className="space-y-4 sm:space-y-6 flex flex-col sm:flex-row items-center justify-between">
+        <div>
+          <h2 className="text-2xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+            Trade Cryptocurrencies
+          </h2>
+          <p className="text-base sm:text-xl text-gray-400">
+            Buy and sell cryptocurrencies instantly
+          </p>
+        </div>
+  
+        {/* AI Trading Toggle */}
+<div className="flex space-x-2 sm:space-x-4">
+  <button
+    onClick={() => {
+      
+        setShowPopup(true); // Show popup when toggling is disabled
+      
+      
+    }}
+   
+    className={`px-4 py-2 text-sm sm:text-lg font-medium rounded-lg transition-colors duration-200 ${
+      aiToggle
+        ? "bg-blue-800 text-white hover:bg-blue-500"
+        : "bg-gray-600 text-gray-200 hover:bg-gray-700"
+    } ${!canToggle ? "cursor-not-allowed " : ""}`}
+  >
+    {aiToggle ? "AI Trading On" : "AI Trading Off"}
+  </button>
 
-  <div className="flex space-x-4 pr-8">
-    
-
-   {/* AI Trading Toggle */}
-<button
-  onClick={() => {
-    if (!canToggle) {
-      showToast({
-        title: "Action Disabled",
-        description: "AI Trading toggle is currently disabled. Please try again later.",
-        variant: "default",
-      });
-    } else {
-      handleAIToggle();
-    }
-  }}
-  disabled={!canToggle}
-  className={`px-4 py-2 text-lg font-medium rounded-lg transition-colors duration-200 ${
-    aiToggle
-      ? 'bg-blue-500 text-white'
-      : 'bg-gray-600 text-gray-200'
-  } ${!canToggle ? 'cursor-not-allowed opacity-50' : ''}`}
->
-  {aiToggle ? 'AI Trading On' : 'AI Trading Off'}
-</button>
-  </div>
+  {/* Popup Dialog */}
+  {showPopup && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-gray-800 text-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+        <h2 className="text-xl font-bold">Action Disabled</h2>
+        <p className="mt-2 text-gray-400">
+          You are not allowed to toggle AI Trading at this moment. Please try again later.
+        </p>
+        <div className="mt-4 flex justify-end space-x-2">
+          <button
+            className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg"
+            onClick={() => setShowPopup(false)} // Close the popup
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
 </div>
-
-      <div  style={{ borderRadius: '2rem' }} className="py-4 mx-12 flex items-center justify-center bg-gray-800 border border-gray-700"> {/* Full-height centering container with gray background */}
-      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-        <Card
-          // Maintain margin and border-radius
-          
-          className="mx-8 w-auto sm:w-[500px] sm:w-py-8 md:w-[500px] lg:w-[600px]  h-auto  bg-gray-800 card-no-border" // Use the same gray color for the card
-        >
-          <div className="  items-center justify-center w-[800] py-8"> {/* Centering content */}
-            <CardHeader className="w-full text-center">
-              <CardTitle className="text-3xl text-white">Place Order</CardTitle>
-            </CardHeader>
-            <CardContent className=" pb-12 w-full sm:w-[500px] md:w-[500px] lg:w-[600px] h-auto ">
-              <div className="space-y-4">
+</div>
+  
+      {/* Place Order Card */}
+      <div
+        style={{ borderRadius: "2rem" }}
+        className="py-4 mx-4 sm:mx-12 flex items-center justify-center bg-gray-800 border border-gray-700"
+      >
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <Card
+            className="w-full sm:w-[500px] lg:w-[600px] bg-gray-800 card-no-border"
+          >
+            <div className="py-6">
+              <CardHeader className="text-center">
+                <CardTitle className="text-xl sm:text-3xl text-white">
+                  Place Order
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Buy/Sell Buttons */}
                 <div className="flex space-x-2">
-                  <Button 
-                    variant={tradeType === 'buy' ? 'default' : 'outline'}
-                    onClick={() => setTradeType('buy')}
-                    style={{ borderRadius: '0.5rem' }}
-                    className={`text-lg flex-1 bg-green-500 hover:bg-green-600 hover:text-white-600 text-white ${tradeType === 'buy' ? 'border-4 border-purple-600' : 'border-none'}`}
+                  <Button
+                    variant={tradeType === "buy" ? "default" : "outline"}
+                    onClick={() => setTradeType("buy")}
+                    className={`text-sm sm:text-lg flex-1 bg-green-500 hover:bg-green-600 text-white ${
+                      tradeType === "buy" ? "border-4 border-purple-600" : "border-none"
+                    }`}
+                    style={{ borderRadius: "0.5rem" }}
                   >
                     Buy
                   </Button>
-                  <Button 
-                    variant={tradeType === 'sell' ? 'default' : 'outline'}
-                    onClick={() => setTradeType('sell')}
-                    style={{ borderRadius: '0.5rem' }}
-                    className={`text-lg flex-1 bg-red-500 hover:bg-red-600 hover:text-white-600 text-white ${tradeType === 'sell' ? 'border-4 border-purple-600' : 'border-none'}`}
+                  <Button
+                    variant={tradeType === "sell" ? "default" : "outline"}
+                    onClick={() => setTradeType("sell")}
+                    className={`text-sm sm:text-lg flex-1 bg-red-500 hover:bg-red-600 text-white ${
+                      tradeType === "sell" ? "border-4 border-purple-600" : "border-none"
+                    }`}
+                    style={{ borderRadius: "0.5rem" }}
                   >
                     Sell
                   </Button>
                 </div>
+  
+                {/* Cryptocurrency Selector */}
                 <Select>
-                  <SelectTrigger 
-                    style={{ borderRadius: '0.5rem' }} 
-                    className="text-lg bg-gray-700 text-white border border-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  <SelectTrigger
+                    style={{ borderRadius: "0.5rem" }}
+                    className="text-sm sm:text-lg bg-gray-700 text-white border border-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <SelectValue 
-                      placeholder="Select cryptocurrency" 
-
-                    />
+                    <SelectValue placeholder="Select cryptocurrency" />
                   </SelectTrigger>
-                  <SelectContent className="text-lg bg-gray-700 text-white border border-gray-600">
-                    <SelectItem className="text-lg" value="btc">Bitcoin (BTC)</SelectItem>
-                    <SelectItem className="text-lg" value="eth">Ethereum (ETH)</SelectItem>
-                    <SelectItem className="text-lg" value="usdt">Tether (USDT)</SelectItem>
+                  <SelectContent className="bg-gray-700 text-white">
+                    <SelectItem value="btc">Bitcoin (BTC)</SelectItem>
+                    <SelectItem value="eth">Ethereum (ETH)</SelectItem>
+                    <SelectItem value="usdt">Tether (USDT)</SelectItem>
                   </SelectContent>
                 </Select>
-
-
-                <Input 
-                  style={{ borderRadius: '0.5rem' }} 
-                  type="number" 
-                  placeholder="Amount" 
-                  className="text-lg  bg-gray-700 text-white border border-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+  
+                {/* Amount Input */}
+                <Input
+                  type="number"
+                  placeholder="Amount"
+                  className="w-full text-sm sm:text-lg bg-gray-700 text-white border border-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  style={{ borderRadius: "0.5rem" }}
                 />
-                
-                <Button 
-                  style={{ borderRadius: '0.5rem' }} 
-                  className="text-lg w-full bg-purple-500 hover:bg-purple-600 text-white" 
+  
+                {/* Place Order Button */}
+                <Button
+                  className="w-full text-sm sm:text-lg bg-purple-500 hover:bg-purple-600 text-white"
+                  style={{ borderRadius: "0.5rem" }}
                   onClick={handlePlaceOrder}
                 >
                   Place Order
                 </Button>
-              </div>
-            </CardContent>
+              </CardContent>
             </div>
           </Card>
         </motion.div>
       </div>
-
-      <motion.div className='px-12 pb-36 py-8 rounded-lg' > 
-  <Card style={{ borderRadius: '2rem' }} className="bg-gray-800 border-gray-700 rounded-lg shadow-lg p-4">
-  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}> 
-    <CardHeader>
-      <CardTitle className="mx-4 text-3xl text-white">Recent Trades</CardTitle>
-    </CardHeader>
-    <CardContent>
-    {loadingg ? (
-  <div className="flex flex-col justify-center items-center h-40">
-    {/* Tailwind CSS spinner */}
-    <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-    <p className="text-white mt-2">Loading your transactions...</p>
-  </div>
-) : error ? (
-        <p className="text-red-500">{error}</p>
-      ) : trades.length === 0 ? (
-        
-        <p className="text-xl text-white text-center" >Hi {userName}, <br/>No trades found for {userEmail}.</p>
-      ) : (
-        <Table className="text-base text-white">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-lg font-bold text-purple-500">Date</TableHead>
-              <TableHead className="text-lg font-bold text-purple-500">Pair</TableHead>
-              <TableHead className="text-lg font-bold text-purple-500">Type</TableHead>
-              <TableHead className="text-lg font-bold text-purple-500">Buy Price</TableHead>
-              <TableHead className="text-lg font-bold text-purple-500">Sell Price</TableHead>
-              <TableHead className="text-lg font-bold text-purple-500">Amount</TableHead>
-              <TableHead className="text-lg font-bold text-purple-500">Profit/Loss</TableHead>
-              <TableHead className="text-lg font-bold text-purple-500">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {trades.map((trade) => (
-              <TableRow key={trade.id}>
-                <TableCell className="text-base">
-                  {trade.date instanceof Timestamp
-                    ? format(trade.date.toDate(), 'dd-MMM-yyyy') // Full month name (e.g., December)
-                    : trade.date}
-                </TableCell>
-                <TableCell>
-                  {trade.pair}
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    className={`${
-                      trade.type === "Buy" ? "text-green-500" : "text-blue-500"
-                    }`}
-                  >
-                    {trade.type}
-                  </Badge>
-                </TableCell>
-                <TableCell>${trade.buyPrice.toFixed(2)}</TableCell>
-                <TableCell>${trade.sellPrice.toFixed(2)}</TableCell>
-                <TableCell>
-                  {trade.amount} {trade.pair.split("/")[0]}
-                </TableCell>
-                <TableCell
-                  className={`text-base ${
-                    trade.profitLoss >= 0 ? "text-green-400" : "text-red-400"
-                  }`}
-                >
-                  ${Math.abs(trade.profitLoss).toFixed(2)}
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    className={`text-base text-white 
-                      ${trade.status === "Win" ? "bg-green-500" : ""}
-                      ${trade.status === "Loss" ? "bg-red-500" : ""}
-                      ${trade.status === "Pending" ? "bg-yellow-500" : ""}
-                    `}
-                  >
-                    {trade.status}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </CardContent>
-    </motion.div>
-  </Card>
-</motion.div>
-
-<Dialog open={showTradePopup} onOpenChange={setShowTradePopup}>
+  
+      {/* Recent Trades */}
+      <motion.div className="px-4 sm:px-12 pb-12">
+        <Card
+          style={{ borderRadius: "2rem" }}
+          className="bg-gray-800 border-gray-700 shadow-lg p-4"
+        >
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <CardHeader>
+              <CardTitle className="text-xl sm:text-3xl text-white">
+                Recent Trades
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loadingg ? (
+                <div className="flex flex-col justify-center items-center h-40">
+                  <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-white mt-2">Loading your transactions...</p>
+                </div>
+              ) : error ? (
+                <p className="text-red-500">{error}</p>
+              ) : trades.length === 0 ? (
+                <p className="text-center text-white">
+                  Hi {userName}, <br />
+                  No trades found for {userEmail}.
+                </p>
+              ) : (
+                <Table className="text-sm sm:text-base text-white">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Pair</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Buy Price</TableHead>
+                      <TableHead>Sell Price</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Profit/Loss</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {trades.map((trade) => (
+                      <TableRow key={trade.id}>
+                        <TableCell>
+                          {trade.date instanceof Timestamp
+                            ? format(trade.date.toDate(), "dd-MMM-yyyy")
+                            : trade.date}
+                        </TableCell>
+                        <TableCell>{trade.pair}</TableCell>
+                        <TableCell>{trade.type}</TableCell>
+                        <TableCell>${trade.buyPrice.toFixed(2)}</TableCell>
+                        <TableCell>${trade.sellPrice.toFixed(2)}</TableCell>
+                        <TableCell>
+                          {trade.amount} {trade.pair.split("/")[0]}
+                        </TableCell>
+                        <TableCell>{trade.profitLoss}</TableCell>
+                        <TableCell>{trade.status}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </motion.div>
+        </Card>
+      </motion.div>
+      <Dialog open={showTradePopup} onOpenChange={setShowTradePopup}>
   <DialogContent style={{ borderRadius: '1rem' }} className="bg-gray-800 text-white">
     <DialogHeader>
       <DialogTitle>Trade Execution Restricted</DialogTitle>
@@ -365,9 +368,9 @@ const TradeTab: React.FC = () => {
     </DialogFooter>
   </DialogContent>
 </Dialog>
-
     </motion.div>
   );
+  
 };
 
 export default TradeTab;

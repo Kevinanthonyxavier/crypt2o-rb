@@ -519,84 +519,102 @@ if (method === "Bank") {
                 </motion.div>
               </TabsContent>
               <TabsContent value="crypto">
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="space-y-4 mt-4"
-                >
-                  <div>
-                    <Label htmlFor="crypto-currency" className="text-lg text-white">Select Currency</Label>
-                    <Select  value={CryptoCurrency} onValueChange={handleCurrencyChange}>
-                      <SelectTrigger id="crypto-currency"  style={{ borderRadius: '0.5rem' }} className={`text-lg bg-gray-700 text-white border-gray-600 ${missingFields.includes('crypto-currency') ? 'border-red-500' : ''}`}>
-                        <SelectValue placeholder="Select currency" />
-                      </SelectTrigger>
-                      <SelectContent className="text-lg  bg-gray-800 text-white border-gray-700">
-                        <SelectItem className="text-lg" value="BTC">Bitcoin (BTC)</SelectItem>
-                        <SelectItem className="text-lg" value="ETH">Ethereum (ETH)</SelectItem>
-                        <SelectItem className="text-lg" value="USDT">Tether (USDT)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="crypto-amount" className="text-lg text-white ">Amount</Label>
-                    <Input 
-                      id="crypto-amount" 
-                      style={{ borderRadius: '0.5rem' }}
-                      type="number" 
-                      placeholder="Enter amount" 
-                      className={`text-lg  bg-gray-700 text-white border-gray-600 placeholder:text-gray-400 ${missingFields.includes('crypto-amount') ? 'border-red-500' : ''}`} 
-                      value={cryptoAmount}
-                      onChange={(e) => setCryptoAmount(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button className="text-lg  w-full bg-purple-500 hover:bg-purple-600 text-white"  style={{ borderRadius: '0.5rem' }} onClick={handleGenerateDepositAddress} disabled={isLoading}>
-                    {isLoading ? 'Generating...' : 'Generate Deposit Address'}
-                  </Button>
-                </motion.div>
-                {showDepositInfo && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="mt-6 space-y-4"
-                  >
-                    <Card style={{ borderRadius: '2rem' }} className="bg-gray-700 border-gray-600">
-                      <CardHeader>
-                        <CardTitle className="text-3xl  text-white">Deposit Information</CardTitle>
-                        <CardDescription className="text-base text-gray-300">
-                          Use the following details to complete your deposit
-                        </CardDescription>
-                      </CardHeader>
-                      <h2 className="text-2xl text-purple-400 flex justify-center">{CryptoName ? `${CryptoName} QR Code` : "No Crypto Name Available!"}</h2>
-                      <CardContent className="space-y-4">
-                        <div className="flex justify-center">
-                          
-                        {qrCodeUrl ? (
-                             <Image src={qrCodeUrl} alt="QR Code" style={{ width: 200, height: 200 }} />
-                               ) : (
-                            <p className="text-lg text-gray-300">No QR code available.</p>
-                           )}
-                        </div>
-                        <div className="flex items-center justify-between bg-gray-800 p-2 rounded">
-                          <span className="text-xl text-white break-all">{walletAddress || "No wallet address available"}</span>
-                          <Button variant="ghost" size="sm" onClick={() => copyToClipboard(walletAddress)}>
-                            <Copy className="text-base h-4 w-4 text-gray-300" />
-                            <span className="sr-only">Copy wallet address</span>
-                          </Button>
-                        </div>
-                        <p className="text-base  text-gray-300">
-                          Please note that deposits may take up to 30 minutes to be credited to your account.
-                        </p>
-                        
-                      </CardContent>
-                      
-                    </Card>
-                    
-                  </motion.div>
-                )}
-              </TabsContent>
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.2 }}
+    className="space-y-4 mt-4 px-4 sm:px-6"
+  >
+    <div>
+      <Label htmlFor="crypto-currency" className="text-lg text-white">Select Currency</Label>
+      <Select value={CryptoCurrency} onValueChange={handleCurrencyChange}>
+        <SelectTrigger 
+          id="crypto-currency"  
+          className={`text-lg bg-gray-700 text-white border-gray-600 rounded-md ${missingFields.includes('crypto-currency') ? 'border-red-500' : ''}`}
+        >
+          <SelectValue placeholder="Select currency" />
+        </SelectTrigger>
+        <SelectContent className="text-lg bg-gray-800 text-white border-gray-700">
+          <SelectItem className="text-lg" value="BTC">Bitcoin (BTC)</SelectItem>
+          <SelectItem className="text-lg" value="ETH">Ethereum (ETH)</SelectItem>
+          <SelectItem className="text-lg" value="USDT">Tether (USDT)</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+    
+    <div>
+      <Label htmlFor="crypto-amount" className="text-lg text-white">Amount</Label>
+      <Input 
+        id="crypto-amount" 
+        type="number" 
+        placeholder="Enter amount" 
+        className={`text-lg bg-gray-700 text-white border-gray-600 placeholder:text-gray-400 rounded-md ${missingFields.includes('crypto-amount') ? 'border-red-500' : ''}`} 
+        value={cryptoAmount}
+        onChange={(e) => setCryptoAmount(e.target.value)}
+        required
+      />
+    </div>
+
+    <Button 
+      className="text-lg w-full bg-purple-500 hover:bg-purple-600 text-white rounded-md"  
+      onClick={handleGenerateDepositAddress} 
+      disabled={isLoading}
+    >
+      {isLoading ? 'Generating...' : 'Generate Deposit Address'}
+    </Button>
+  </motion.div>
+
+  {showDepositInfo && (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+      className="mt-6 space-y-4 px-4 sm:px-6"
+    >
+      <Card className="bg-gray-700 border-gray-600 rounded-lg">
+        <CardHeader>
+          <CardTitle className="text-2xl sm:text-3xl text-white">Deposit Information</CardTitle>
+          <CardDescription className="text-base text-gray-300">
+            Use the following details to complete your deposit
+          </CardDescription>
+        </CardHeader>
+        <h2 className="text-xl sm:text-2xl text-purple-400 text-center">
+          {CryptoName ? `${CryptoName} QR Code` : "No Crypto Name Available!"}
+        </h2>
+        <CardContent className="space-y-4">
+          <div className="flex justify-center">
+            {qrCodeUrl ? (
+              <Image 
+                src={qrCodeUrl} 
+                alt="QR Code" 
+                width={200} 
+                height={200} 
+                className="object-cover"
+              />
+            ) : (
+              <p className="text-lg text-gray-300">No QR code available.</p>
+            )}
+          </div>
+          
+          <div className="flex items-center justify-between bg-gray-800 p-2 rounded-md">
+            <span className="text-lg sm:text-xl text-white break-all">
+              {walletAddress || "No wallet address available"}
+            </span>
+            <Button variant="ghost" size="sm" onClick={() => copyToClipboard(walletAddress)}>
+              <Copy className="text-base h-4 w-4 text-gray-300" />
+              <span className="sr-only">Copy wallet address</span>
+            </Button>
+          </div>
+          
+          <p className="text-base text-gray-300">
+            Please note that deposits may take up to 30 minutes to be credited to your account.
+          </p>
+        </CardContent>
+      </Card>
+    </motion.div>
+  )}
+</TabsContent>
+
               
             </Tabs>
           
@@ -608,19 +626,27 @@ if (method === "Bank") {
       </motion.div>
      </div>
 
-      <Dialog open={showFiatDepositPopup} onOpenChange={setShowFiatDepositPopup}>
-        <DialogContent style={{ borderRadius: '2rem' }} className="bg-gray-800 text-white">
-          <DialogHeader>
-            <DialogTitle>Deposit Pending</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <p>Your deposit is pending. Please hold on, you will get a call from our accounts team to confirm this deposit.</p>
-          </div>
-          <DialogFooter>
-            <Button style={{ borderRadius: '0.5rem' }} onClick={() => setShowFiatDepositPopup(false)} className="bg-purple-500 hover:bg-purple-600">Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+     <Dialog open={showFiatDepositPopup} onOpenChange={setShowFiatDepositPopup}>
+  <DialogContent className="bg-gray-800 text-white rounded-lg p-6 max-w-sm mx-auto sm:max-w-md">
+    <DialogHeader>
+      <DialogTitle className="text-lg sm:text-xl">Deposit Pending</DialogTitle>
+    </DialogHeader>
+    <div className="py-4">
+      <p className="text-base sm:text-lg">
+        Your deposit is pending. Please hold on, you will get a call from our accounts team to confirm this deposit.
+      </p>
+    </div>
+    <DialogFooter>
+      <Button 
+        onClick={() => setShowFiatDepositPopup(false)} 
+        className="bg-purple-500 hover:bg-purple-600 rounded-md w-full"
+      >
+        Close
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
     </motion.div>
   );
 }

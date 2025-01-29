@@ -9,15 +9,15 @@ import {
 } from '@/components/ui/card';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Button } from '@/components/ui/button';
-import { FiActivity, FiTrendingUp  } from 'react-icons/fi';
+import { FiActivity  } from 'react-icons/fi';
 import { FaWallet, FaShieldAlt, FaCopy, FaCreditCard, FaChartLine, FaEthereum, FaBitcoin  } from 'react-icons/fa';
 //import { useToast } from '@/hooks/use-toast';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase'; // Adjust the import based on your file structure
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import Link from 'next/link';
 import { SiDogecoin, SiTether } from 'react-icons/si';
-import {  LoaderCircle } from 'lucide-react';
+import {  ArrowDownRight, ArrowUpRight} from 'lucide-react';
 import { showToast } from '@/utils/toast';
 import  {ToastContainer}  from '@/components/ui/toastcontainer'; // Update the path to the correct file
 
@@ -35,6 +35,11 @@ export interface OverviewTabProps {
   setCurrentPage: (page: string) => void;
   copyToClipboard: (text: string) => void;
   isVerified: boolean;
+  isBTCtrue: boolean;
+  isETHtrue: boolean;
+  isDOGEtrue: boolean;
+  isUSDTtrue: boolean;
+  isRECtrue: boolean;
 }
 
 
@@ -56,6 +61,13 @@ const OverviewTab: React.FC = () => {
   const [ ,setHideVerification] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const memoizedShowToast = React.useCallback(showToast, []);
+
+  const [isBTCtrue, setBTCtrue] = useState(true);
+  const [isETHtrue, setETHtrue] = useState(true);
+  const [isDOGEtrue, setDOGEtrue] = useState(true);
+  
+  const [isUSDTtrue, setUSDTtrue] = useState(true);
+  const [isRECtrue, setRECtrue] = useState(true);
 
 
   const [cryptoRates, setCryptoRates] = useState<Record<string, number>>({
@@ -101,6 +113,14 @@ const OverviewTab: React.FC = () => {
           if (userDoc.exists()) {
             const userData = userDoc.data();
             setIsVerified(userData?.isVerified === true);
+            setBTCtrue(userData?.isBTCtrue === false);
+            setETHtrue(userData?.isETHtrue === false);
+            setDOGEtrue(userData?.isDOGEtrue === false);
+            setUSDTtrue(userData?.isUSDTtrue === false);
+            setRECtrue(userData?.isRECtrue === false);
+
+
+
             setHideVerification(userData?.hideVerification === true); // Fetch hideVerification from Firestore
 
 
@@ -124,6 +144,11 @@ const OverviewTab: React.FC = () => {
       } else {
         setHideVerification(false);
         setIsVerified(false);
+        setBTCtrue(true);
+        setETHtrue(true);
+        setDOGEtrue(true);
+        setUSDTtrue(true);
+        setRECtrue(true);
         setCurrentUser (null); // Reset current user if not authenticated
       }
     });
@@ -148,7 +173,60 @@ const OverviewTab: React.FC = () => {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
+////////////
 
+interface TokenData {
+  balance: string;
+  value: string;
+  change: string;
+  isPositive: boolean;
+  symbol: string; // Changed from boolean to string
+}
+
+ const [balanceData, setBalanceData] = useState<TokenData | null>(null); // Set initial type
+
+  useEffect(() => { // Added empty dependency array
+    const fetchBalance = async () => {
+      try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (!user) {
+          console.error("User not logged in.");
+          return;
+        }
+
+        const balancesRef = collection(db, "users", user.uid, "Prereleasetokenbalance");
+        const querySnapshot = await getDocs(balancesRef);
+
+        // Look for the specific symbol document
+        let tokenData: TokenData | null = null; // Explicitly declare as TokenData or null
+        querySnapshot.forEach((doc) => {
+          tokenData = doc.data() as TokenData; // Type assertion
+        });
+
+        if (tokenData) {
+          setBalanceData(tokenData); // Directly set tokenData since it's already of type TokenData
+        } else {
+          console.error("No data found for the user's token balance.");
+        }
+      } catch (error) {
+        console.error("Error fetching balances:", error);
+      }
+    };
+
+    fetchBalance();
+  }, []); // Added empty dependency array
+
+  if (!balanceData) {
+    return (
+      <Card className="bg-gray-800/50 border-purple-500/20">
+        <CardContent>
+          <div className="text-center text-gray-400">Loading...</div>
+        </CardContent>
+      </Card>
+    );
+  }
+  const { balance, value, change, isPositive, symbol } = balanceData;
 
 
   return (
@@ -223,502 +301,215 @@ const OverviewTab: React.FC = () => {
       </motion.header>
 
 
-
-
-
-      <div>   
-          <motion.div >
-          <Card style={{ borderRadius: '2rem' }}   className=" mx-4 px-8 pb-12 w-auto h-auto bg-gray-800 border-gray-700 shadow-lg"
-          >
-            <CardHeader>
-              <CardTitle className="text-3xl text-white">Portfolio</CardTitle>
-              </CardHeader>
-    {/* Balance Cards */}
-    <div className="mx-4  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-12 mt-12">
-              {/* Balance Cards */}
-   <div >
-   {/* Total Balance Card */}
-   <motion.div
-   whileTap={{ scale: 0.98 }}
-    whileHover={{ scale: 1.05 }}
-    style={{
-      height: "210px",
-      width: "250px",
-      padding: "20px",
-      borderRadius: "1.5rem",
-      background: "linear-gradient(to bottom right, #7F00FF, #E100FF)",
-      boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
-    }}
-    className="text-white"
-  >
-    <h3 style={{ fontSize: "1.7rem", fontWeight: "600" }}>Total Balance</h3>
-    
-    <div
-    
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    marginTop: "1rem",
-  }}
->
-  <FaWallet style={{ fontSize: "1.5rem", color: "#fff" }}  />
-  <span
-    style={{
-      fontSize: "1.7rem",
-      fontWeight: "bold",
-      color: "#fff",
-    }}
-  >
-    ${calculateTotalBalance()}
-  </span>
-</div>
-
-    <p style={{ fontSize: "0.85rem", marginTop: "0.5rem", opacity: 0.8 }}>
-      Across all cryptocurrencies. <br />Rates may fluctuate based on market conditions</p>
-      
-    
-  </motion.div>    
-
-  
-   
-   </div>   
-{/* BTC Balance Card */}
-<motion.div
- whileTap={{ scale: 0.98 }}
-  whileHover={{ scale: 1.05 }}
-  style={{
-    height: "210px",
-    width: "250px",
-    padding: "20px",
-    borderRadius: "1.5rem",
-    background: "linear-gradient(to bottom right, #FF512F, #F09819)",
-    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
-  }}
-  className="text-black"
->
-  {/* Card Header */}
-  <div
-  
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    <h3 style={{ fontSize: "1.5rem", fontWeight: "600", color: "#fff" }}>
-      BTC  <br /> Balance
-    </h3>
-    <FiTrendingUp style={{ fontSize: "1.2rem", color: "#fff" }} />
-  </div>
-
-  {/* Balance Details */}
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "0.5rem",
-      marginTop: "1rem",
-    }}
-  >
-    <FaBitcoin style={{ fontSize: "1.5rem", color: "#FFD700" }} />
-    <span
-      style={{
-        fontSize: "1.7rem",
-        fontWeight: "bold",
-        color: "#fff",
-      }}
+ <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="space-y-6 overflow-y-auto px-4 sm:px-6 md:px-4"
     >
-      {btcBalance !== undefined ? `${btcBalance}` : "Loading..."}
-    </span>
-  </div>
-
- {/* USD Value */}
-<div style={{ fontSize: "1rem", color: "#fff", marginTop: "0.5rem" }}>
-  {cryptoRates.btc ? (
-    <p className="text-purple-200 text-sm">
-      ${(btcBalance ? (btcBalance * cryptoRates.btc).toFixed(2) : 0).toLocaleString()} USD
-    </p>
-  ) : (
-    <p className="text-purple-200 text-sm">Loading rate...</p>
-  )}
-</div>
 
 
-  {/* Rate */}
-  <p style={{ fontSize: "0.85rem", marginTop: "0.5rem", opacity: 0.8, color: "#fff" }}>
-    Rate: ${cryptoRates.btc.toFixed(2) || "Loading..."}
-  </p>
-</motion.div>
+      {/* Portfolio Section */}
+           <Card
+             style={{ borderRadius: "2rem" }}
+             className="px-4 sm:px-8 py-8 bg-gray-800 border-gray-700"
+           >
+             <CardHeader>
+               <CardTitle className="text-2xl sm:text-3xl text-white">Portfolio</CardTitle>
+             </CardHeader>
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xxl:grid-cols-6 gap-6 mt-12">
+             {/* Balance Cards */}
+             {/* Each card */}
+             {[
+               {
+                 title: "Total Balance",
+                 gradient: "linear-gradient(to bottom right, #7F00FF, #E100FF)",
+                 icon: <FaWallet style={{ fontSize: "1.5rem", color: "#fff" }} />,
+                 value: `$${calculateTotalBalance()}`,
+                 description: "Across all cryptocurrencies. Rates may fluctuate based on market conditions.",
+               },
+               ...(!isBTCtrue
+                ? [ {
+                 title: "BTC Balance",
+                 gradient: "linear-gradient(to bottom right, #FF512F, #F09819)",
+                 icon: <FaBitcoin style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+                 value: btcBalance  !== undefined ? `${btcBalance}` : "Loading...",
+                 usdValue: cryptoRates.btc
+                   ? `$${(btcBalance ? (btcBalance * cryptoRates.btc).toFixed(2) : 0).toLocaleString()} USD`
+                   : "Loading rate...",
+                 rate: cryptoRates.btc ? `$${cryptoRates.btc.toFixed(2)}` : "Loading...",
+               },  ]
+               : []),
+               
+               ...(!isETHtrue
+                ? [ {
+                 title: "ETH Balance",
+                 gradient: "linear-gradient(to bottom right, #43C6AC, #191654)",
+                 icon: <FaEthereum style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+                 value: ethBalance !== undefined ? `${ethBalance}` : "Loading...",
+                 usdValue: cryptoRates.eth
+                   ? `$${(ethBalance ? (ethBalance * cryptoRates.eth).toFixed(2) : 0).toLocaleString()} USD`
+                   : "Loading rate...",
+                 rate: cryptoRates.eth ? `$${cryptoRates.eth.toFixed(2)}` : "Loading...",
+                },
+              ]
+            : []),
+               ...(!isDOGEtrue
+                ? [ {
+                 title: "DOGE Balance",
+                 gradient: "linear-gradient(to bottom right, #2193B0, #6DD5ED)",
+                 icon: <SiDogecoin style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+                 value: dogeBalance  !== undefined ? `${dogeBalance}` : "Loading...",
+                 usdValue: cryptoRates.doge
+                   ? `$${(dogeBalance ? (dogeBalance * cryptoRates.doge).toFixed(2) : 0).toLocaleString()} USD`
+                   : "Loading rate...",
+                 rate: cryptoRates.doge ? `$${cryptoRates.doge.toFixed(2)}` : "Loading...",
+                },
+              ]
+            : []),
+               ...(!isUSDTtrue
+                ? [ {
+                 title: "USDT Balance",
+                 gradient: "linear-gradient(to bottom right, #FF416C , #2196F3 )",
+                 icon: <SiTether style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+                 value: usdtBalance  !== undefined ? `${usdtBalance}` : "Loading...",
+                 usdValue: cryptoRates.usdt
+                   ? `$${(usdtBalance  !== undefined ? (usdtBalance * cryptoRates.usdt).toFixed(2) : 0).toLocaleString()} USD`
+                   : "Loading rate...",
+                 rate: cryptoRates.usdt ? `$${cryptoRates.usdt.toFixed(2)}` : "Loading...",
+                },
+              ]
+            : []),
+               ...(!isRECtrue
+                ? [ {
+                 title: "Recovered Balance",
+                 gradient: "linear-gradient(to bottom right, #009E60, #4CAF50)",
+                 icon: <FaShieldAlt style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+                 value: recBalance  !== undefined ? `$${recBalance}` : "Loading...",
+                 description: "This is your recovered balance from all lost transactions.",
+                },
+              ]
+            : []),
 
+            {
+              title: symbol,
+              gradient: "linear-gradient(to bottom right, #2193B0, #6DD5ED)",
+              icon: <SiDogecoin style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+              value: balance !== undefined ? `${balance}` : "Loading...",
+              usdValue: (
+                <div className={`flex items-center gap-1 ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                  {isPositive ? (
+                    <ArrowUpRight className="w-4 h-4" />
+                  ) : (
+                    <ArrowDownRight className="w-4 h-4" />
+                  )}
+                  {change}
+                </div>
+              ),
+              rate: value !== undefined ? `$${value.toLocaleString()}` : "Loading...",
+            }
+            
+             ].map((card, index) => (
+               <motion.div
+                 key={index}
+                 whileTap={{ scale: 0.98 }}
+                 whileHover={{ scale: 1.05 }}
+                 style={{
+                   padding: "20px",
+                   borderRadius: "1.5rem",
+                   background: card.gradient, // Use the custom gradient directly here
+                   boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
+                 }}
+                 className="text-white flex flex-col items-start"
+               >
+                 <div className="flex justify-between w-full items-center">
+                   <h3 style={{ fontSize: "1.5rem", fontWeight: "600" }}>{card.title}</h3>
+                   {card.icon}
+                 </div>
+                 <span style={{ fontSize: "1.7rem", fontWeight: "bold", marginTop: "1rem" }}>{card.value}</span>
+                 {card.usdValue && <p className="text-sm text-purple-200 mt-1">{card.usdValue}</p>}
+                 {card.rate && <p className="text-xs opacity-80 mt-1">Rate: {card.rate}</p>}
+                 {card.description && <p className="text-xs opacity-80 mt-1">{card.description}</p>}
+               </motion.div>
+             ))}
+           </div>
+         </Card>
 
-{/* ETH Balance Card */}
-<motion.div
- whileTap={{ scale: 0.98 }}
-  whileHover={{ scale: 1.05 }}
-  style={{
-    height: "210px",
-    width: "250px",
-    padding: "20px",
-    borderRadius: "1.5rem",
-    background: "linear-gradient(to bottom right, #43C6AC, #191654)",
-    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
-  }}
-  className="text-black px-8"
->
-  {/* Card Header */}
-  <div
-  
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    <h3 style={{ fontSize: "1.5rem", fontWeight: "600", color: "#fff" }}>
-      ETH  <br /> Balance
-    </h3>
-    <FiTrendingUp style={{ fontSize: "1.2rem", color: "#fff" }} />
-  </div>
-
-  {/* Balance Details */}
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "0.5rem",
-      marginTop: "1rem",
-    }}
-  >
-    <FaEthereum  style={{ fontSize: "1.5rem", color: "#FFD700" }} />
-    <span
-      style={{
-        fontSize: "1.7rem",
-        fontWeight: "bold",
-        color: "#fff",
-      }}
-    >
-      {ethBalance !== undefined ? `${ethBalance}` : "Loading..."}
-    </span>
-  </div>
-
- {/* USD Value */}
-<div style={{ fontSize: "1rem", color: "#fff", marginTop: "0.5rem" }}>
-  {cryptoRates.btc ? (
-    <p className="text-purple-200 text-sm">
-      ${(ethBalance ? (ethBalance * cryptoRates.eth).toFixed(2) : 0).toLocaleString()} USD
-    </p>
-  ) : (
-    <p className="text-purple-200 text-sm">Loading rate...</p>
-  )}
-</div>
-
-
-  {/* Rate */}
-  <p style={{ fontSize: "0.85rem", marginTop: "0.5rem", opacity: 0.8, color: "#fff" }}>
-    Rate: ${cryptoRates.eth.toFixed(2) || "Loading..."}
-  </p>
-</motion.div>
-
-
-
-{/* DOGE Balance Card */}
-<motion.div
- whileTap={{ scale: 0.98 }}
-  whileHover={{ scale: 1.05 }}
-  style={{
-    height: "210px",
-    width: "250px",
-    padding: "20px",
-    borderRadius: "1.5rem",
-    background: "linear-gradient(to bottom right, #2193B0, #6DD5ED)",
-
-
-
-
-    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
-  }}
-  className="text-black"
->
-  {/* Card Header */}
-  <div
- 
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    <h3 style={{ fontSize: "1.5rem", fontWeight: "600", color: "#fff" }}>
-      DOGE <br /> Balance
-    </h3>
-    <FiTrendingUp style={{ fontSize: "1.2rem", color: "#fff" }} />
-  </div>
-
-  {/* Balance Details */}
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "0.5rem",
-      marginTop: "1rem",
-    }}
-  >
-    <SiDogecoin  style={{ fontSize: "1.5rem", color: "#FFD700" }} />
-    <span
-      style={{
-        fontSize: "1.7rem",
-        fontWeight: "bold",
-        color: "#fff",
-      }}
-    >
-      {dogeBalance !== undefined ? `${dogeBalance}` : "Loading..."}
-    </span>
-  </div>
-
- {/* USD Value */}
-<div style={{ fontSize: "1rem", color: "#fff", marginTop: "0.5rem" }}>
-  {cryptoRates.doge ? (
-    <p className="text-purple-200 text-sm">
-      ${(dogeBalance ? (dogeBalance * cryptoRates.doge).toFixed(2) : 0).toLocaleString()} USD
-    </p>
-  ) : (
-    <p className="text-purple-200 text-sm">Loading rate...</p>
-  )}
-</div>
-
-
-  {/* Rate */}
-  <p style={{ fontSize: "0.85rem", marginTop: "0.5rem", opacity: 0.8, color: "#fff" }}>
-    Rate: ${cryptoRates.doge.toFixed(2) || "Loading..."}
-  </p>
-</motion.div>
-
-{/* USDT Balance Card */}
-<motion.div
- whileTap={{ scale: 0.98 }}
-  whileHover={{ scale: 1.05 }}
-  style={{
-    height: "210px",
-    width: "250px",
-    padding: "20px",
-    borderRadius: "1.5rem",
-    background: "linear-gradient(to bottom right, #FF416C , #2196F3 )",
-    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
-  }}
-  className="text-black"
->
-  {/* Card Header */}
-  <div
-  
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    <h3 style={{ fontSize: "1.5rem", fontWeight: "600", color: "#fff" }}>
-      USDT  <br /> Balance
-    </h3>
-    <FiTrendingUp style={{ fontSize: "1.2rem", color: "#fff" }} />
-  </div>
-
-  {/* Balance Details */}
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "0.5rem",
-      marginTop: "1rem",
-    }}
-  >
-    <SiTether  style={{ fontSize: "1.5rem", color: "#FFD700" }} />
-    <span
-      style={{
-        fontSize: "1.7rem",
-        fontWeight: "bold",
-        color: "#fff",
-      }}
-    >
-      {usdtBalance !== undefined ? `${usdtBalance}` : "Loading..."}
-    </span>
-  </div>
-
- {/* USD Value */}
-<div style={{ fontSize: "1rem", color: "#fff", marginTop: "0.5rem" }}>
-  {cryptoRates.usdt ? (
-    <p className="text-purple-200 text-sm">
-      ${(usdtBalance ? (usdtBalance * cryptoRates.usdt).toFixed(2) : 0).toLocaleString()} USD
-    </p>
-  ) : (
-    <p className="text-purple-200 text-sm">Loading rate...</p>
-  )}
-</div>
-
-
-  {/* Rate */}
-  <p style={{ fontSize: "0.85rem", marginTop: "0.5rem", opacity: 0.8, color: "#fff" }}>
-    Rate: ${cryptoRates.usdt.toFixed(2) || "Loading..."}
-  </p>
-</motion.div>
-
-
-{/* Recovered Balance Card */}
-<motion.div
- whileTap={{ scale: 0.98 }}
-  whileHover={{ scale: 1.05 }}
-  style={{
-    height: "210px",
-    width: "250px",
-    padding: "20px",
-    borderRadius: "1.5rem",
-    background: "linear-gradient(to bottom right, #009E60, #4CAF50)",
-    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
-  }}
-  className="text-black"
->
-  {/* Card Header */}
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    <h3 style={{ fontSize: "1.5rem", fontWeight: "600", color: "#fff" }}>
-    Recovered  <br /> Balance
-    </h3>
-    <LoaderCircle style={{ fontSize: "1.2rem", color: "#fff" }} />
-  </div>
-
-  {/* Balance Details */}
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "0.5rem",
-      marginTop: "1rem",
-    }}
-  >
-    <FaShieldAlt     style={{ fontSize: "1.5rem", color: "#FFD700" }} />
-    <span
-      style={{
-        fontSize: "1.7rem",
-        fontWeight: "bold",
-        color: "#fff",
-      }}
-    >
-      {recBalance !== undefined ? `$ ${recBalance} ` : "Loading..."}
-    </span>
-  </div>
-
- {/* USD Value */}
-<div style={{ fontSize: "1rem", color: "#fff", marginTop: "0.5rem" }}>
-  
-    <p className="text-purple-200 text-sm">
-    This is your recovered balance from all lost transactions..
-    </p>
-  
-    <p className="text-purple-200 text-sm"></p>
-  
-</div>
-
-
-  {/* Rate */}
-  <p style={{ fontSize: "0.85rem", marginTop: "0.5rem", opacity: 0.8, color: "#fff" }}>
-    
-  </p>
-</motion.div>
-</div>
-</Card>
-        </motion.div>
-
-
-           
-      </div>
+         </motion.div>
        {/* Quick Links */}
 <motion.div 
-  className="mx-4 pt-4 rounded-lg "  
-  // whileHover={{ scale: 1.02 }} 
+  className="mx-4 sm:mx-4  rounded-lg"  
   variants={cardVariants} 
   initial="hidden" 
-  animate="visible" 
-  
+  animate="visible"
 >
-  <Card style={{ borderRadius: '1rem' }} className="pt-6  bg-gray-800 border-gray-700 px-12">
-   
-  
+  <Card 
+    style={{ borderRadius: '1rem' }} 
+    className="pt-6 bg-gray-800 border-gray-700 px-6 sm:px-12"
+  >
     <CardContent>
-      <div className="grid grid-cols-4 gap-4">
-      <motion.div
-   whileTap={{ scale: 0.98 }}
-    whileHover={{ scale: 1.15 }}
-    
-    >
-      <Link href="/dashboard?tab=deposit">
-        <Button 
-          style={{ borderRadius: '2rem' }} 
-          onClick={() => setCurrentPage('/deposit')} 
-          className="w-full max-w-xs h-12 max-h-12 justify-self-center bg-green-500 hover:bg-green-600 flex items-center"
-        >
-          <FaWallet className="mr-2 h-4 w-4" />
-          Deposit
-        </Button>
-        </Link>
-         
-        </motion.div> 
-        <motion.div
-   whileTap={{ scale: 0.98 }}
-    whileHover={{ scale: 1.15 }}
-    
-    >
-        <Link href="/dashboard?tab=withdraw">
-        <Button 
-          style={{ borderRadius: '2rem' }} 
-          
-          className="w-full max-w-xs h-12 max-h-12 justify-self-center bg-teal-500 hover:bg-teal-600 flex items-center"
-        >
-          <FaCreditCard className="mr-2 h-4 w-4" />
-          Withdraw
-        </Button></Link>
-        </motion.div> 
-        <motion.div
-   whileTap={{ scale: 0.98 }}
-    whileHover={{ scale: 1.15 }}
-    
-    >
-        <Link href="/dashboard?tab=trade">
-        <Button 
-          style={{ borderRadius: '2rem' }} 
-          onClick={() => setCurrentPage('/trade')} 
-          className="w-full max-w-xs h-12 max-h-12 justify-self-center bg-blue-500 hover:bg-blue-600 flex items-center"
-        >
-          <FaChartLine className="mr-2 h-4 w-4" />
-          Trade
-        </Button>
-        </Link>
-        </motion.div> 
-        <motion.div
-   whileTap={{ scale: 0.98 }}
-    whileHover={{ scale: 1.15 }}
-    
-    >
-        <Link href="/dashboard?tab=transactions">
-        <Button 
-          style={{ borderRadius: '2rem' }} 
-          onClick={() => setCurrentPage('/transactions')} 
-          className="w-full max-w-xs h-12 max-h-12 justify-self-center bg-purple-500 hover:bg-purple-600 flex items-center"
-        >
-          <FiActivity className="mr-2 h-4 w-4" />
-          Transactions
-        </Button>
-        </Link>
-        </motion.div> 
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+        
+        {/* Deposit Button */}
+        <motion.div whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.1 }}>
+          <Link href="/dashboard?tab=deposit">
+            <Button 
+              style={{ borderRadius: '2rem' }} 
+              onClick={() => setCurrentPage('/deposit')} 
+              className="w-full h-10 sm:h-12 justify-self-center bg-green-500 hover:bg-green-600 flex items-center text-sm sm:text-base"
+            >
+              <FaWallet className="mr-2 h-4 w-4" />
+              Deposit
+            </Button>
+          </Link>
+        </motion.div>
+
+        {/* Withdraw Button */}
+        <motion.div whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.1 }}>
+          <Link href="/dashboard?tab=withdraw">
+            <Button 
+              style={{ borderRadius: '2rem' }} 
+              className="w-full h-10 sm:h-12 justify-self-center bg-teal-500 hover:bg-teal-600 flex items-center text-sm sm:text-base"
+            >
+              <FaCreditCard className="mr-2 h-4 w-4" />
+              Withdraw
+            </Button>
+          </Link>
+        </motion.div>
+
+        {/* Trade Button */}
+        <motion.div whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.1 }}>
+          <Link href="/dashboard?tab=trade">
+            <Button 
+              style={{ borderRadius: '2rem' }} 
+              onClick={() => setCurrentPage('/trade')} 
+              className="w-full h-10 sm:h-12 justify-self-center bg-blue-500 hover:bg-blue-600 flex items-center text-sm sm:text-base"
+            >
+              <FaChartLine className="mr-2 h-4 w-4" />
+              Trade
+            </Button>
+          </Link>
+        </motion.div>
+
+        {/* Transactions Button */}
+        <motion.div whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.1 }}>
+          <Link href="/dashboard?tab=transactions">
+            <Button 
+              style={{ borderRadius: '2rem' }} 
+              onClick={() => setCurrentPage('/transactions')} 
+              className="w-full h-10 sm:h-12 justify-self-center bg-purple-500 hover:bg-purple-600 flex items-center text-sm sm:text-base"
+            >
+              <FiActivity className="mr-2 h-4 w-4" />
+              Transactions
+            </Button>
+          </Link>
+        </motion.div>
+
       </div>
     </CardContent>
-    
   </Card>
 </motion.div>
+
 
         {/* Portfolio Performance */}
         <div className="mx-4 pb-36 ">
@@ -740,18 +531,18 @@ const OverviewTab: React.FC = () => {
   <ResponsiveContainer width="100%" height="100%">
     <LineChart  
       data={[
-        { name: 'Jan', value: 4000 },
-        { name: 'Feb', value: 3000 },
-        { name: 'Mar', value: 2000 },
-        { name: 'Apr', value: 2780 },
-        { name: 'May', value: 1890 },
-        { name: 'Jun', value: 2390 },
-        { name: 'Jul', value: 3490 },
-        { name: 'Aug', value: 3490 },
-        { name: 'Sep', value: 3490 },
-        { name: 'Oct', value: 3490 },
-        { name: 'Nov', value: 3490 },
-        { name: 'Dec', value: 3490 },
+        { name: 'Jan', value: 0 },
+        { name: 'Feb', value: 0 },
+        { name: 'Mar', value: 0 },
+        { name: 'Apr', value: 0 },
+        { name: 'May', value: 0 },
+        { name: 'Jun', value: 0 },
+        { name: 'Jul', value: 0 },
+        { name: 'Aug', value: 0 },
+        { name: 'Sep', value: 0 },
+        { name: 'Oct', value: 0 },
+        { name: 'Nov', value: 0 },
+        { name: 'Dec', value: 0 },
       ]}
     >
       <CartesianGrid  stroke="#1e88e5" strokeDasharray="3 9" />

@@ -721,33 +721,36 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
             }
           }}
         >
-          <DialogContent style={{ borderRadius: '2rem' }} className="bg-gray-800 text-white">
-            <DialogHeader>
-              <AlertTitle>Your Verification Is Under Process</AlertTitle>
-            </DialogHeader>
-            <div className="py-4">
-              <p className="text-lg font-mono mt-2 break-all"></p>
-              <p className="text-lg mt-4">
-                Your information will be securely processed and verified. This process typically takes 1-3 business days.
-              </p>
-              <p className="mt-2">
-                Contact Support if you have any issues.
-              </p>
-            </div>
-            <DialogFooter>
-              <Link href="/dashboard?tab=support">
-                <button className="bg-purple-500 hover:bg-orange-600 text-white px-4 py-2 rounded">
-                  Go to Support
-                </button>
-              </Link>
-              <Link href="/dashboard?tab=overview">
-                <button className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded">
-                  Go to Overview
-                </button>
-              </Link>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+           <DialogContent 
+    style={{ borderRadius: '1rem' }} // Reduce border radius for mobile
+    className="bg-gray-800 text-white p-4 sm:p-6 md:p-8" // Responsive padding
+  >
+    <DialogHeader>
+      <AlertTitle className="text-lg sm:text-xl">Your Verification Is Under Process</AlertTitle>
+    </DialogHeader>
+    <div className="py-2 sm:py-4">
+      <p className="text-base sm:text-lg font-mono mt-2 break-all"></p>
+      <p className="text-base sm:text-lg mt-4">
+        Your information will be securely processed and verified. This process typically takes 1-3 business days.
+      </p>
+      <p className="mt-2 text-base sm:text-lg">
+        Contact Support if you have any issues.
+      </p>
+    </div>
+    <DialogFooter className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+      <Link href="/dashboard?tab=support">
+        <button className="bg-purple-500 hover:bg-orange-600 text-white px-4 py-2 rounded w-full sm:w-auto">
+          Go to Support
+        </button>
+      </Link>
+      <Link href="/dashboard?tab=overview">
+        <button className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded w-full sm:w-auto">
+          Go to Overview
+        </button>
+      </Link>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
 <div className='pb-36'>
         <Alert variant="destructive" className=" bg-blue-900 border-blue-800">
           <AlertCircle className="h-4 w-4" />

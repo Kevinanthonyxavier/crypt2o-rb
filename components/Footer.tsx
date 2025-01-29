@@ -30,6 +30,7 @@ export default function Footer() {
               <li><Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Home</Link></li>
               <li><Link href="#features" className="text-gray-400 hover:text-purple-400 transition-colors">Features</Link></li>
               <li><Link href="#benefits" className="text-gray-400 hover:text-purple-400 transition-colors">Benefits</Link></li>
+              <li><Link href="#crypto recovery" className="text-gray-400 hover:text-purple-400 transition-colors">Crypto Recovery Services</Link></li>
               <li><Link href="#about" className="text-gray-400 hover:text-purple-400 transition-colors">About Us</Link></li>
             </ul>
           </motion.div>
@@ -68,16 +69,19 @@ export default function Footer() {
             <Button 
               className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-300"
               onClick={() => setIsAffiliateModalOpen(true)}
+              disabled
             >
               Sign Up as an Affiliate
             </Button>
-            <Link href="/affiliate-dashboard">
+            {/* <Link  href="/affiliate-dashboard"> */}
               <Button 
+              
                 className="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+                disabled
               >
                 Log in
               </Button>
-            </Link>
+            {/* </Link> */}
           </div>
         </motion.div>
         

@@ -171,21 +171,21 @@ const UserProfile: React.FC = () => {
     exit={{ opacity: 0 }}
     className="container  space-y-6"
   >
-    <div className="space-y-6">
-      <h2 className="pl-8 text-4xl  font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">Profile</h2>
-      <p className="pl-12 text-xl text-gray-400">Manage your account information</p>
+   <div className="space-y-6">
+      <h2 className="pl-4 text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">Profile</h2>
+      <p className="pl-4 text-lg sm:text-xl text-gray-400">Manage your account information</p>
     </div>
-    {/* <div className=" pb-36 "   > */}
-    <div  style={{ borderRadius: '2rem' }} className=" py-4 mx-12 mb-12 flex items-center justify-center bg-gray-800 border border-gray-700"> {/* Full-height centering container with gray background */}
-      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+     <div className=" pb-36 "   >
+     <div style={{ borderRadius: '2rem' }} className="py-4  sm:mx-12 mb-12 flex items-center justify-center bg-gray-800 border border-gray-700">
+     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
         <Card
           // Maintain margin and border-radius
           
-          className="mx-8 w-auto sm:w-[500px] md:w-[500px] lg:w-[600px] h-auto bg-gray-800 card-no-border">
+           className="mx-4 sm:mx-8 w-auto sm:w-auto md:w-auto lg:w-[600px] h-auto  card-no-border">
         
-          <div className="  items-center justify-center w-[800] py-8"> {/* Centering content */}
+          <div className="  items-center justify-center py-8"> {/* Centering content */}
             <CardHeader className="w-full text-center">
-            <CardTitle className=" text-3xl  text-white">Hi {userData?.name || ''},</CardTitle>
+            <CardTitle className="sm:text-3xl text-xl  text-white">Hi {userData?.name || ''},</CardTitle>
             <p className="text-base text-white text-opacity-80 opacity-50">If your not able to make changes. Please contact Support!</p>
           </CardHeader>
           <CardContent >
@@ -408,7 +408,7 @@ const UserProfile: React.FC = () => {
           </CardContent>
         </Card>
       </motion.div> */}
-
+</div>
   </motion.div>
   
   );

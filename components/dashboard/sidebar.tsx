@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {  DollarSign, User, HelpCircle, LogOut } from 'lucide-react';
+import {  DollarSign, User, HelpCircle, LogOut, Menu, X, HandCoins } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -16,6 +16,7 @@ import { FiActivity } from "react-icons/fi";
 import { BsBank2 } from "react-icons/bs";
 import { MdVerifiedUser } from "react-icons/md";
 import { CgCompressRight } from "react-icons/cg";
+
 
 
 interface DashboardRoute {
@@ -31,6 +32,38 @@ const Sidebar: React.FC = () => {
   const [selfieUrl, setSelfieUrl] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const currentTab = searchParams ? searchParams.get('tab') : null;
+
+  const [showSidebar, setShowSidebar] = useState(() => {
+    // Check if the window width is greater than or equal to the desktop breakpoint (e.g., 768px)
+    return typeof window !== "undefined" && window.innerWidth >= 768;
+  });
+  
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    // Update sidebar visibility on window resize
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setShowSidebar(true); // Always show sidebar for desktop
+      } else {
+        setShowSidebar(false); // Collapse sidebar for smaller screens
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup listener on unmount
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  
+
+  // Close sidebar after selecting a menu item
+  const handleMenuItemClick = () => {
+    if (window.innerWidth < 768) {
+      setShowSidebar(false); // Close sidebar on mobile
+    }
+  };
+
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
@@ -73,6 +106,7 @@ const Sidebar: React.FC = () => {
   
 
   const dashboardRoutes: DashboardRoute[] = [
+    { path: '/dashboard?tab=token-pre-release', label: 'Token Pre Release', icon: HandCoins  },
     { path: '/dashboard?tab=overview', label: 'Overview', icon: RxDashboard  },
     { path: '/dashboard?tab=trade', label: 'Trade', icon: IoTrendingUp },
     { path: '/dashboard?tab=transactions', label: 'Transactions', icon: FiActivity  },
@@ -91,15 +125,46 @@ const Sidebar: React.FC = () => {
   const handleLogout = () => {
     auth.signOut();
     localStorage.clear();
-    window.location.href = '/';
+    if (typeof window !== 'undefined') {
+      console.log(window.location.href  = "/home"); // This will only execute in the browser
+    }
+
   };
 
   return (
-    <aside className="w-64 bg-black bg-opacity-30 backdrop-blur-lg p-6 hidden md:block relative h-screen">
-      <div className="relative h-full overflow-y-auto">
+    <>
+
+      {/* Hamburger Menu Button */}
+      <button
+        className="fixed top-4 left-4 z-50 md:hidden p-2 bg-purple-600 text-white rounded focus:outline-none"
+        onClick={() => setShowSidebar(!showSidebar)}
+      >
+        {showSidebar ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+      </button>
+
+      {/* Backdrop */}
+      {showSidebar && window.innerWidth < 768 && (
+  <div
+    className="fixed inset-0 bg-black bg-opacity-50 z-30"
+    onClick={() => setShowSidebar(false)}
+  ></div>
+)}
+
+
+      {/* Sidebar */}
+      <motion.aside
+        ref={sidebarRef}
+        className={`fixed top-0 left-0 h-full w-64 bg-black bg-opacity-30 backdrop-blur-lg p-6 z-40 transform ${
+          showSidebar ? 'translate-x-0' : '-translate-x-full'
+        } md:static md:translate-x-0`}
+        initial={{ x: '-100%' }}
+        animate={{ x: showSidebar ? '0%' : '-100%' }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      >
+      <div className="relative h-full overflow-auto">
         {/* Logo */}
         <motion.h1
-          className="pl-2 text-2xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-pink-600"
+          className="text-right pr-2 pl-2 text-2xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-pink-600"
           whileHover={{ scale: 1.05 }}
         >
           Crypt2o.com
@@ -142,7 +207,9 @@ const Sidebar: React.FC = () => {
               const isActive = currentTab === route.path.split('=')[1];
 
               return (
-                <motion.li key={route.path} whileHover={{ scale: 1.05 }}>
+                <motion.li key={route.path} whileHover={{ scale: 1.05 }}
+                onClick={handleMenuItemClick} // Close sidebar on click
+                  >
                   <Button
                     asChild
                     variant={isActive ? 'default' : 'ghost'}
@@ -164,7 +231,10 @@ const Sidebar: React.FC = () => {
         </nav>
 
         {/* Logout */}
-        <motion.li className="mt-6" whileHover={{ scale: 1.05 }}>
+        <motion.div className="mt-6" whileHover={{ scale: 1.05 }}>
+          {/* Divider Line */}
+  <div className="border-t border-white border-opacity-30 mb-4"></div>
+
           <Button
             variant="ghost"
             className="w-full justify-start text-white hover:bg-white hover:bg-purple-300"
@@ -173,7 +243,7 @@ const Sidebar: React.FC = () => {
             <LogOut className="mr-2 h-4 w-4" />
             Logout
           </Button>
-        </motion.li>
+        </motion.div>
 
         {/* Account Verification */}
         <div className="mt-6 pb-16">
@@ -207,7 +277,12 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
       </div>
-    </aside>
+    
+      </motion.aside>
+
+       
+      </>
+    
   );
 };
 

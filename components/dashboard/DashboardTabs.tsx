@@ -9,7 +9,8 @@ import {
   DollarSign as DollarSignIcon, 
   User as UserIcon, 
   
-  HelpCircle as HelpCircleIcon 
+  HelpCircle as HelpCircleIcon, 
+  HandCoins
 } from 'lucide-react';
 
 import TradeTab from './tabs/TradeTab';
@@ -30,6 +31,7 @@ import { FiActivity } from "react-icons/fi";
 import { BsBank2 } from "react-icons/bs";
 import { MdVerifiedUser } from "react-icons/md";
 import { CgCompressRight } from "react-icons/cg";
+import TokenPreReleaseTab from './tabs/TokenPreReleaseTab';
 
 type IconMapping = {
   [key: string]: React.ComponentType<{ className?: string }>
@@ -89,6 +91,7 @@ const DashboardTabs: React.FC = () => {
   if (!isClient || loading) return <div>Loading...</div>; // Show loading state
 
   const iconMap: IconMapping = {
+    HandCoins: HandCoins,
     RxDashboard: RxDashboard,
     IoTrendingUp: IoTrendingUp,
     FiActivity: FiActivity,
@@ -101,6 +104,7 @@ const DashboardTabs: React.FC = () => {
   };
 
   const tabConfig: TabConfig[] = [
+    { value: 'token-pre-release', name: 'Token Pre-Release', icon: 'HandCoins', component: TokenPreReleaseTab },
     { value: 'overview', name: 'Overview', icon: 'RxDashboard', component: OverviewTab },
     { value: 'trade', name: 'Trade', icon: 'IoTrendingUp', component: TradeTab },
     { value: 'transactions', name: 'Transactions', icon: 'FiActivity', component: TransactionsTab },

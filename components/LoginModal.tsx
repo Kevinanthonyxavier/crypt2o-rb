@@ -203,7 +203,7 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
         variant: 'default',
       });
   
-      router.push('/dashboard');
+      router.push('/dashboard?tab=token-pre-release');
     }catch (error: unknown) {
       // Check if the error is an instance of Error
       if (error instanceof Error) {

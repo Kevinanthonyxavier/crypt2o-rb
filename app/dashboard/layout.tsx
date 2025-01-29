@@ -6,6 +6,7 @@ import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Sidebar from '@/components/dashboard/sidebar';
 import Header from '@/components/dashboard/header';
+import AutoLogout from '@/components/dashboard/AutoLogout';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -39,12 +40,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
+   
     <div className="flex h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+       <AutoLogout />
       <Sidebar />
       <main className="flex-1 flex flex-col overflow-hidden">
         <Header />
-        <div className="flex-1  p-6 bg-background">{children}</div>
+        <div className="flex-1 p-6 bg-background overflow-y-auto">{children}</div>
       </main>
     </div>
   );
+  
 }

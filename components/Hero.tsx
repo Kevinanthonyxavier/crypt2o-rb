@@ -3,12 +3,16 @@
 import { motion, useAnimation } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { useInView } from 'react-intersection-observer'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Variants } from 'framer-motion';
+import LoginModal from './LoginModal'
+import RegisterModal from './RegisterModal'
 
 
 export default function Hero() {
   const controls = useAnimation()
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
   const [ref, inView] = useInView({
     triggerOnce: false,
     threshold: 0.2,
@@ -66,7 +70,7 @@ export default function Hero() {
   };
 
   return (
-    <section ref={ref} className="pt-32 pb-20 px-4 relative">
+    <section id="home" ref={ref} className="pt-32 pb-20 px-4 relative ">
       <motion.div
         className="container mx-auto text-center relative z-10"
         variants={containerVariants}
@@ -108,7 +112,7 @@ export default function Hero() {
               hidden: { opacity: 0 },
               visible: { opacity: 1 }
             }}
-            transition={{ delay: 3.5, duration: 0.5 }}
+            transition={{ delay: 3.5, duration: 1.5 }}
           >
                           <motion.div
                 variants={getStartedVariants}
@@ -116,22 +120,26 @@ export default function Hero() {
                 animate="animate" // Set the animate state
                 className="inline-block"
                 style={{ transformStyle: "preserve-3d" }}
+                transition={{ duration: 4, ease: "easeInOut" }} // Smooth and slower animation
+
               >
                 <Button 
                   size="lg" 
-                  className="bg-purple-600 hover:bg-purple-700 transition-all duration-300 transform hover:scale-105"
+                  className="bg-purple-600 hover:bg-purple-700 transition-all duration-700 transform hover:scale-105"
                   style={{ backfaceVisibility: "hidden" }}
-                >
-                  Get Started
+                  onClick={() => setIsLoginModalOpen(true)} >
+                  Login
                 </Button>
                 <Button 
                   size="lg" 
-                  className="bg-purple-600 hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 absolute inset-0"
+                  className="bg-purple-600 hover:bg-purple-700 transition-all duration-700 transform hover:scale-105 absolute inset-0"
                   style={{ backfaceVisibility: "hidden", transform: "rotateX(180deg)" }}
-                >
-                  Get Started
+                  onClick={() => setIsLoginModalOpen(true)} >
+                  Login
                 </Button>
-              </motion.div>
+              </motion.div><LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+                    <RegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} />
+
           </motion.div>
           <motion.div
             className="inline-block perspective-1000"
@@ -143,7 +151,7 @@ export default function Hero() {
             }}
             transition={{ delay: 3.7, duration: 0.5 }}
           >
-            <Button size="lg" variant="outline" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white transition-all duration-300 transform hover:scale-105">
+            <Button onClick={() => setIsRegisterModalOpen(true)} size="lg" variant="outline" className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white transition-all duration-300 transform hover:scale-105">
               Register
             </Button>
           </motion.div>
@@ -199,6 +207,7 @@ function AnimatedBackground() {
         className="absolute bottom-20 left-1/2 w-20 h-20 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-70"
       ></motion.div>
     </motion.div>
+    
   )
 }
 

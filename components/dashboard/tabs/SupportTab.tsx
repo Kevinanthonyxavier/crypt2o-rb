@@ -294,7 +294,7 @@ const SupportCenter: React.FC = () => {
   // };
 
   return (
-    <TabsContent value="support" className="p-8 pb-32">
+    <TabsContent value="support" className="p-4 pb-32 sm:p-8">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -306,21 +306,21 @@ const SupportCenter: React.FC = () => {
           initial={{ y: -20 }}
           animate={{ y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-4xl font-bold mb-8 text-center text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600"
-        >
+          className="text-2xl sm:text-3xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600"
+          >
           Support Center
         </motion.h1>
 
         {/* Category Filters */} 
-        <div className="text-lg flex flex-wrap justify-center space-x-4 mb-8">
-  {['General', 'Account', 'Transactions', 'Security'].map(category => (
+<div className="grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 mb-6">
+        {['General', 'Account', 'Transactions', 'Security'].map(category => (
     <Button
       key={category}
       role="tab"
       aria-selected={selectedCategory === category}
       aria-label={`Filter by ${category} category`}
       style={{ borderRadius: '2rem' }}
-      className={`text-base transition duration-200 ease-in-out ${
+      className={`text-sm sm:text-base transition duration-200 rounded-full px-4 py-2 ${
         selectedCategory === category
           ? 'bg-purple-600 text-white hover:bg-purple-600  '
           : 'bg-purple-300 text-black hover:bg-purple-700 hover:text-white'
@@ -335,29 +335,32 @@ const SupportCenter: React.FC = () => {
 </div>
 
 
-<div className="grid gap-8 md:grid-cols-2">
-  <motion.div
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    style={{ height: '200px' }}
-  >
-    <Card className="bg-gray-100 bg-gray-800 border-2-gray-700 mb-4" style={{ height: '450px', borderRadius: '2rem' }}>
-      <CardHeader>
-        <CardTitle className='text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600'>Quick Help</CardTitle>
-        <CardDescription className="text-base text-gray-400">Find answers to common questions</CardDescription>
+<div className="grid gap-4 sm:gap-8 grid-cols-1 sm:grid-cols-2">
+<motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+        <Card
+          className="bg-gray-100 bg-gray-800 border-2-gray-700 mb-4"
+          style={{ height: '450px', borderRadius: '2rem' }}> 
+        
+          <CardHeader>
+        
+            <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+              Quick Help
+            </CardTitle>        
+            <CardDescription className="text-sm sm:text-base text-gray-400">
+            Find answers to common questions</CardDescription>
       </CardHeader>
-      <CardContent className="max-h-64 overflow-y-auto">
+      <CardContent className="max-h-72 overflow-y-auto">
         {loading ? (
           <div className='text-white text-lg'>Loading FAQs...</div>
         ) : faqItems.length === 0 ? (
           <div className='text-white text-lg'>No FAQs available.</div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-2">
             {filteredFAQs.map((item) => (
               <Button
                 key={item.question}
                 variant="ghost"
-                className="text-white text-lg w-full justify-between"
+                className="text-white text-sm sm:text-base w-full justify-between"
                 onClick={() => {
                   console.log('Button clicked:', item.question); // Debugging line
                  
@@ -507,8 +510,8 @@ const SupportCenter: React.FC = () => {
                     <p className="text-red-500 text-sm">{formErrors.message}</p>
                   )}
                 </div>
-                <Button type="submit" className="text-lg w-full bg-purple-500 hover:bg-purple-600 text-white" disabled={isSubmitting}>
-  <Send className="mr-2 h-4 w-4" /> {isSubmitting ? 'Submitting...' : 'Submit Ticket'}
+                <Button type="submit" className="w-full text-sm sm:text-lg bg-purple-500 hover:bg-purple-600 text-white" disabled={isSubmitting}>
+                <Send className="mr-2 h-4 w-4" /> {isSubmitting ? 'Submitting...' : 'Submit Ticket'}
 
 </Button>
               </form>
@@ -527,12 +530,15 @@ const SupportCenter: React.FC = () => {
 
         <Card style={{ borderRadius: '2rem' }} className="bg-gray-100 bg-gray-800 border-gray-700  mb-8"> 
           <CardHeader>
-            <CardTitle className='text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600'>FAQs</CardTitle>
-            <CardDescription className="text-lg text-gray-400">Frequently asked questions</CardDescription>
+          <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+          FAQs</CardTitle>
+          <CardDescription className="text-sm sm:text-base text-gray-400">
+          Frequently asked questions</CardDescription>
           </CardHeader>
           <CardContent>
           {loading ? (
-          <p className="text-purple600 text-lg">Loading FAQs...</p>
+           <p className="text-purple-600 text-sm sm:text-base">
+           Loading FAQs...</p>
         ) : faqItems.length === 0 ? (
           <p className="text-white">No FAQs available at the moment. Please check back later.</p>
         ) : (
@@ -540,7 +546,7 @@ const SupportCenter: React.FC = () => {
             {faqItems.map((item, index) => (
               <AccordionItem value={`item-${index}`} key={index}>
                 <AccordionTrigger className="text-xl text-blue-200">{item.question}</AccordionTrigger>
-                <AccordionContent className=" text-lg text-white">{item.answer}</AccordionContent>
+                <AccordionContent className="text-sm sm:text-base text-white">{item.answer}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>

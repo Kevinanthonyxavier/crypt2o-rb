@@ -327,9 +327,15 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
     
     <Dialog open={isOpen} onOpenChange={onClose}>
       
-      <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white max-h-screen overflow-y-auto">
+      <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white max-h-screen overflow-y-auto mb-36">
         
         <DialogHeader>
+        <div
+  className="h-48"
+  style={{
+    height: window.innerWidth > 768 ? '0px' : '2rem', // 768px is the `md` breakpoint in Tailwind
+  }}
+></div>
           
           <DialogTitle className="text-2xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
             {showOtpInput ? 'Verify Your Email' : 'Create a Crypt2o.com Account'}
@@ -551,6 +557,7 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
                 />
                 <Label htmlFor="profile-notifications">Receive email notifications</Label>
               </div>
+              
 {/* Error Message Display */}
 {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
             </>
@@ -577,6 +584,13 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
             {showOtpInput ? 'Verify OTP' : 'Register'}
           </Button>
         </form>
+        <div
+  className="h-48"
+  style={{
+    height: window.innerWidth > 768 ? '0px' : '16rem', // 768px is the `md` breakpoint in Tailwind
+  }}
+></div>
+
       </DialogContent>
     </Dialog>
     </div>

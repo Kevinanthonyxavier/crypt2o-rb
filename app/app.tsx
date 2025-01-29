@@ -1,5 +1,5 @@
 'use client'
-//new 21-1-24
+//new 21-1-29
 import { motion } from 'framer-motion'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
@@ -11,6 +11,7 @@ import Footer from '@/components/Footer'
 import FallingCryptoLogos from '@/components/FallingCryptoLogos'
 import TawkToChat from '@/components/TawkToChat'
 import { FirebaseProvider } from '@/contexts/FirebaseContext'
+import CryptoRecoveryServices from '@/components/CryptoRecoveryServices'
 
 export default function Home() {
   return (
@@ -43,6 +44,7 @@ export default function Home() {
           <Features />
           <Benefits />
           <InterestCalculator />
+          <CryptoRecoveryServices />
           <AboutUs />
         </motion.main>
         <Footer />
