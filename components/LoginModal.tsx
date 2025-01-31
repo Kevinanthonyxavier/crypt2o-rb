@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { EyeIcon, EyeOffIcon, TriangleAlert } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { showToast } from '@/utils/toast';
-import { useToast } from '@/hooks/use-toast';
+//import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
@@ -53,7 +53,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
   const [error, setError] = useState<string | null>(null);
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
-  const { toast } = useToast();
+  //const { toast } = useToast();
   //forgotpassword
   const [isForgotPassword, setIsForgotPassword] = useState(false); // New state for forgot password
 
@@ -64,7 +64,7 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
 
   try {
     await sendPasswordResetEmail(auth, loginForm.email);
-    toast({
+    showToast({
       title: 'Password Reset Email Sent',
       description: 'Check your email for the password reset link.',
       variant: 'default',
@@ -72,7 +72,7 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     setIsForgotPassword(false); // Close forgot password dialog
   } catch (error) {
     console.error('Error sending password reset email:', error);
-    toast({
+    showToast({
       title: 'Error',
       description: 'Failed to send password reset email. Please try again.',
       variant: 'destructive',
@@ -147,7 +147,7 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
       const data = await response.json();
       setUserId(data.userId);
   
-      toast({
+      showToast({
         title: "OTP Sent",
         description: "An OTP has been sent to your email. Please enter it below.",
         variant: "default",
@@ -157,7 +157,7 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     } catch (error) {
       console.error("Login error:", error);
       setError(error instanceof Error ? error.message : "An unknown error occurred.");
-      toast({
+      showToast({
         title: "Login Failed",
         description: error instanceof Error ? error.message : "Unable to log in. Please try again.",
         variant: "destructive",
@@ -189,13 +189,7 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     }
   };
 
-  useEffect(() => {
-    if (otp.join("").length === 6) {
-      handleVerifyOtp();
-    }
-  }, [otp]);
-  
-  const handleVerifyOtp = async () => {
+  const handleVerifyOtp = useCallback(async () => {
     if (otp.join("").length < 6) {
       setError("Please enter a complete OTP.");
       return;
@@ -212,7 +206,7 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
 
       if (!response.ok) throw new Error("Invalid OTP. Please try again.");
 
-      toast({
+      showToast({
         title: "Login Successful",
         description: "Welcome to Crypt2o.com!",
         variant: "default",
@@ -222,12 +216,23 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "OTP verification failed.";
       setError(errorMessage);
-      toast({ title: "OTP Verification Failed", description: errorMessage, variant: "destructive" });
+      showToast({ title: "OTP Verification Failed", description: errorMessage, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [otp, userId, router]); // Dependencies for the callback
 
+
+
+
+
+
+  // useEffect to trigger OTP verification when the OTP is complete
+  useEffect(() => {
+    if (otp.join("").length === 6) {
+      handleVerifyOtp();
+    }
+  }, [otp, handleVerifyOtp]); // Dependencies for useEffect
   
 
   const { user } = useUser(); // Get the user from context
@@ -238,7 +243,7 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     // Use email from login form or user context
   
     if (!email) {
-      toast({
+      showToast({
         title: "Resend Failed",
         description: "No email found. Please log in again.",
         variant: "destructive",
@@ -258,7 +263,7 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
       console.log("Resend OTP Response:", data);
       if (!response.ok) throw new Error(data.message || "Failed to resend OTP.");
   
-      toast({
+      showToast({
         title: "OTP Resent",
         description: "A new OTP has been sent to your email.",
         variant: "default",
@@ -267,7 +272,7 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
       console.error("Resend OTP Error:", error);
 
       const errorMessage = error instanceof Error ? error.message : "Resend failed.";
-      toast({ title: "Resend Failed", description: errorMessage, variant: "destructive" });
+      showToast({ title: "Resend Failed", description: errorMessage, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
