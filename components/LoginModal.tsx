@@ -15,8 +15,15 @@ import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
+import {  useUser } from '@/contexts/UserContext';
 
 
+export interface User {
+  uid: string;
+  email: string | null; // Allow null
+  displayName: string | null;
+  photoURL: string | null;
+}
 
 
 
@@ -29,6 +36,8 @@ interface LoginModalProps {
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const router = useRouter();
+  useUser(); // Import useUser() to manage user state
+
   
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -84,86 +93,89 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     }
   }, [error]);
 
+  const redirectToVerifyEmail = () => {
+    setTimeout(() => {
+      router.push("/verify-email");
+    }, 3000);
+  };
 
+  // const validateForm = () => {
+  //   if (!loginForm.email || !loginForm.password) {
+  //     setError("Email and Password are required.");
+  //     return false;
+  //   }
+  //   return true;
+  // };
+  
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!validateForm()) return;
     setIsLoading(true);
-
+  
     try {
       const userCredential = await signInWithEmailAndPassword(auth, loginForm.email, loginForm.password);
       const user = userCredential.user;
-      
-
+  
       if (!user.emailVerified) {
-        // Redirect to the verify email page if the email is not verified
         showToast({
-          title: 'Email Not Verified',
-          description: 'Please verify your email address before logging in.',
-          variant: 'destructive',
+          title: "Email Not Verified",
+          description: "Please verify your email address before logging in.",
+          variant: "error",
         });
-        router.push('/verify-email'); // Redirect to the verification page
-        return; // Early return to prevent further execution
+  
+        redirectToVerifyEmail();
+        return;
       }
-
-      const response = await fetch('/api/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+  
+      // export interface User {
+      //   uid: string;
+      //   email: string | null; // Allow null
+      //   displayName: string | null;
+      //   photoURL: string | null;
+      // }
+      
+      const response = await fetch("/api/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: user.email }),
       });
-
+  
       if (!response.ok) {
-        throw new Error('Failed to send OTP. Please try again.');
+        throw new Error("Failed to send OTP. Please try again.");
       }
-
+  
       const data = await response.json();
       setUserId(data.userId);
-
+  
       toast({
-        title: 'OTP Sent',
-        description: 'An OTP has been sent to your email. Please enter it below.',
-        variant: 'default',
+        title: "OTP Sent",
+        description: "An OTP has been sent to your email. Please enter it below.",
+        variant: "default",
       });
-
+  
       setIsOtpStage(true);
-    } catch (error: unknown) {
-      // Check if the error is an instance of Error
-      if (error instanceof Error) {
-        console.error('Login error:', error);
-        setError(error.message); // Safely access message property
-    
-        toast({
-          title: 'Login Failed',
-          description: error.message || 'Unable to log in. Please try again.',
-          variant: 'destructive',
-        });
-      } else {
-        // Handle the case where the error is not an instance of Error
-        console.error('Login error:', error);
-        setError('An unknown error occurred. Please try again.');
-    
-        toast({
-          title: 'Login Failed',
-          description: 'An unknown error occurred. Please try again.',
-          variant: 'destructive',
-        });
-      }
-    }
-    finally {
+    } catch (error) {
+      console.error("Login error:", error);
+      setError(error instanceof Error ? error.message : "An unknown error occurred.");
+      toast({
+        title: "Login Failed",
+        description: error instanceof Error ? error.message : "Unable to log in. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
     }
   };
 
 
-
   const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const value = e.target.value;
-  
-    if (!/^\d$/.test(value) && value !== '') return; // Allow only single digits
+    if (!/^\d$/.test(value) && value !== "") return;
+
     const updatedOtp = [...otp];
     updatedOtp[index] = value;
     setOtp(updatedOtp);
-  
-    // Automatically focus the next input
+
     if (value && index < 5) {
       const nextInput = document.querySelector<HTMLInputElement>(`input[data-index="${index + 1}"]`);
       nextInput?.focus();
@@ -171,112 +183,146 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
   };
   
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      // Move focus to the previous input
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
       const prevInput = document.querySelector<HTMLInputElement>(`input[data-index="${index - 1}"]`);
       prevInput?.focus();
     }
   };
+
+  useEffect(() => {
+    if (otp.join("").length === 6) {
+      handleVerifyOtp();
+    }
+  }, [otp]);
   
   const handleVerifyOtp = async () => {
-    if (otp.join('').length < 6) {
-      setError('Please enter a complete OTP.');
+    if (otp.join("").length < 6) {
+      setError("Please enter a complete OTP.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, otp: otp.join("") }),
+      });
+
+      if (!response.ok) throw new Error("Invalid OTP. Please try again.");
+
+      toast({
+        title: "Login Successful",
+        description: "Welcome to Crypt2o.com!",
+        variant: "default",
+      });
+
+      router.push("/dashboard?tab=token-pre-release");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "OTP verification failed.";
+      setError(errorMessage);
+      toast({ title: "OTP Verification Failed", description: errorMessage, variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  
+
+  const { user } = useUser(); // Get the user from context
+
+  const handleResendOtp = async () => {
+    const email = loginForm.email || user?.email;
+    console.log("Sending OTP to:", email);
+    // Use email from login form or user context
+  
+    if (!email) {
+      toast({
+        title: "Resend Failed",
+        description: "No email found. Please log in again.",
+        variant: "destructive",
+      });
       return;
     }
   
     setIsLoading(true);
   
     try {
-      const response = await fetch('/api/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, otp: otp.join('') }), // Convert OTP array to string
+      const response = await fetch("/api/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
       });
-  
-      if (!response.ok) {
-        throw new Error('Invalid OTP. Please try again.');
-      }
+      const data = await response.json();
+      console.log("Resend OTP Response:", data);
+      if (!response.ok) throw new Error(data.message || "Failed to resend OTP.");
   
       toast({
-        title: 'Login Successful',
-        description: 'Welcome to Crypt2o.com!',
-        variant: 'default',
+        title: "OTP Resent",
+        description: "A new OTP has been sent to your email.",
+        variant: "default",
       });
+    } catch (error) {
+      console.error("Resend OTP Error:", error);
+
+      const errorMessage = error instanceof Error ? error.message : "Resend failed.";
+      toast({ title: "Resend Failed", description: errorMessage, variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
-      router.push('/dashboard?tab=token-pre-release');
-    }catch (error: unknown) {
-      // Check if the error is an instance of Error
-      if (error instanceof Error) {
-        setError(error.message || 'Invalid OTP.');
-        console.error('OTP verification error:', error);
+  ///////////
+
+  // const [loginForm, setLoginForm] = useState({
       
-        toast({
-          title: 'OTP Verification Failed',
-          description: error.message || 'Invalid OTP.',
-          variant: 'destructive',
-        });
-      } else {
-        // Handle the case where the error is not an instance of Error
-        setError('Invalid OTP.'); // or any other default message you prefer
-        console.error('OTP verification error:', error);
+  //     email: '',
+      
+  //     password: '',
+      
+  //   });
+ const [formErrors, setFormErrors] = useState<{
+   
+    email?: string;
+   
+    password?: string;
+   
+
+  }>({});
+
+  const validateForm = (): boolean => {
+    const errors: Partial<typeof loginForm> = {};
+
+   
+
+    if (!loginForm.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginForm.email)) {
+      errors.email = 'Invalid email format';
+    }
+
+   
+    if (!loginForm.password.trim()) {
+      errors.password = 'password is required';
+    }
+     // Password regex check
+     const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_]).{8,}$/; // At least one letter, one number, one special character, and at least 8 characters long
+     if (loginForm.password && !passwordRegex.test(loginForm.password)) {
+       errors.password = "Password must be at least 8 characters long and include a number and a special character.";
+     }
+
     
-        toast({
-          title: 'OTP Verification Failed',
-          description: 'An unknown error occurred during OTP verification.',
-          variant: 'destructive',
-        });
-      }
-    }
-    finally {
-      setIsLoading(false);
-    }
-  };
-  
-  
 
-  const handleResendOtp = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch('/api/resend-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: loginForm.email }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to resend OTP. Please try again.');
-      }
-
-      toast({
-        title: 'OTP Resent',
-        description: 'A new OTP has been sent to your email.',
-        variant: 'default',
-      });
-    }catch (error: unknown) {
-      // Check if the error is an instance of Error
-      if (error instanceof Error) {
-        toast({
-          title: 'Resend Failed',
-          description: error.message || 'Unable to resend OTP.',
-          variant: 'destructive',
-        });
-      } else {
-        // Handle the case where the error is not an instance of Error
-        toast({
-          title: 'Resend Failed',
-          description: 'An unknown error occurred while trying to resend the OTP.',
-          variant: 'destructive',
-        });
-      }
-    }
-    finally {
-      setIsLoading(false);
-    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  
+  //////////////
 
   return (
+    <div id="login">
+
     
     <Dialog open={isOpen} onOpenChange={onClose}>
             
@@ -322,8 +368,10 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
               value={loginForm.email}
               onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
             
-              className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+              // className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+              className={`bg-white bg-opacity-10 border-white border-opacity-20 ${formErrors.email ? 'border-red-500' : ''}`}
             />
+            {formErrors.email && <p className="text-red-500 text-sm">{formErrors.email}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
@@ -337,7 +385,10 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
                      type={showPassword ? 'text' : 'password'}
                 
                        required
-                      className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 pr-10"
+                     
+                      className={`bg-gray-700 border-gray-600 text-white placeholder-gray-400 ${
+                        formErrors.password ? 'border-red-500' : ''
+                      }`}
               />
               
               <button
@@ -351,7 +402,9 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
                   <EyeIcon className="h-5 w-5" />
                 )}
               </button>
+             
             </div>
+            {formErrors.password && <p className="text-red-500 text-sm">{formErrors.password}</p>}
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -409,7 +462,7 @@ Enter OTP
     onChange={(e) => handleOtpChange(e, index)}
     onKeyDown={(e) => handleKeyDown(e, index)}
     data-index={index}
-
+    disabled={isLoading}
     
   />
 ))}</div>  
@@ -425,10 +478,15 @@ className="flex flex-row items-center justify-center text-red-500 text-sm"
 )}
 
         
-            <Button onClick={handleVerifyOtp} className="w-full" disabled={isLoading}>
-              {isLoading ? 'Verifying...' : 'Verify OTP'}
-            </Button>
+<Button
+    onClick={handleVerifyOtp}
+    className={`w-full ${otp.every((digit) => digit !== '') ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-500 cursor-not-allowed'}`}
+    disabled={isLoading || otp.some((digit) => digit === '')} // Disable if OTP is incomplete
+  >
+    {isLoading ? 'Verifying...' : 'Verify OTP'}
+  </Button>
             <Button onClick={handleResendOtp} className="mt-4 w-full" disabled={isLoading}>
+            
               {isLoading ? 'Resending...' : 'Resend OTP'}
             </Button>
           </div>
@@ -436,5 +494,6 @@ className="flex flex-row items-center justify-center text-red-500 text-sm"
         )}
       </DialogContent>
     </Dialog>
+    </div>
   );
 }

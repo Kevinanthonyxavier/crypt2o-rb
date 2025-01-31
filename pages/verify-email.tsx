@@ -7,12 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import '@/app/globals.css';
+import LoginModal from '@/components/LoginModal';
 
 
 const VerifyEmail: React.FC = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [isSending, setIsSending] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
 
   // Function to resend the verification email
   const resendVerificationEmail = async () => {
@@ -59,7 +61,7 @@ const VerifyEmail: React.FC = () => {
  
   
     const redirectToGmail = () => {
-      window.location.href = 'https://mail.google.com/';
+      window.open("https://mail.google.com", "_blank"); // Opens Gmail in a new tab
     };
 
   return (
@@ -84,11 +86,24 @@ const VerifyEmail: React.FC = () => {
               <Button onClick={resendVerificationEmail} disabled={isSending} className="flex-2  bg-orange-400">
                 {isSending ? 'Sending...' : 'Resend Verification Email'}
               </Button>
-              <Button variant="secondary" onClick={() => router.push('/login')} className="flex-1">
-                Back to Login
-              </Button>
+              <Button 
+  variant="secondary"
+  onClick={() => {
+   // setIsLoginModalOpen(true); // Open the login modal
+     router.push("/login"); // Navigate to "/"
+  }}
+  className="bg-purple-600 hover:bg-purple-700"
+>
+  Back to Login
+</Button>
+
+{/* Login Modal Component */}
+{isLoginModalOpen && (
+  <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+)}
             </div>
             
+     
 
                <div className="flex flex-row items-center h-16 gap-6 w-full">
       <Button

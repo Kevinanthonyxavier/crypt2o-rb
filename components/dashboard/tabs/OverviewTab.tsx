@@ -164,7 +164,8 @@ const OverviewTab: React.FC = () => {
       (ethBalance || 0) * cryptoRates.eth +
       (dogeBalance || 0) * cryptoRates.doge +
       (usdtBalance || 0) * cryptoRates.usdt +
-      (recBalance || 0) 
+      (recBalance || 0) +
+      (Array.isArray(balanceData) ? balanceData.reduce((acc, token) => acc + (Number(token.value) || 0), 0) : 0) // Sum up token values 
     );
   };
 
@@ -177,58 +178,68 @@ const OverviewTab: React.FC = () => {
 
 interface TokenData {
   balance: string;
-  value: string;
+  value: number;
   change: string;
   isPositive: boolean;
   symbol: string; // Changed from boolean to string
 }
 
- const [balanceData, setBalanceData] = useState<TokenData | null>(null); // Set initial type
+ const [error, setError] = useState<string | null>(null);
+ const [, setLoadingg] = useState<boolean>(true);
+ const [balanceData, setBalanceData] = useState<TokenData[] | null>(null);
 
-  useEffect(() => { // Added empty dependency array
-    const fetchBalance = async () => {
-      try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (!user) {
-          console.error("User not logged in.");
-          return;
-        }
+ useEffect(() => {
+  const auth = getAuth();
 
-        const balancesRef = collection(db, "users", user.uid, "Prereleasetokenbalance");
-        const querySnapshot = await getDocs(balancesRef);
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      console.error("User not logged in.");
+      setLoadingg(false);
+      return;
+    }
 
-        // Look for the specific symbol document
-        let tokenData: TokenData | null = null; // Explicitly declare as TokenData or null
-        querySnapshot.forEach((doc) => {
-          tokenData = doc.data() as TokenData; // Type assertion
-        });
+    setLoadingg(true);
 
-        if (tokenData) {
-          setBalanceData(tokenData); // Directly set tokenData since it's already of type TokenData
-        } else {
-          console.error("No data found for the user's token balance.");
-        }
-      } catch (error) {
+    try {
+      const balancesRef = collection(db, "users", user.uid, "Prereleasetokenbalance");
+      const querySnapshot = await getDocs(balancesRef);
+
+      // Convert documents into an array
+      const tokens: TokenData[] = querySnapshot.docs.map((doc) => ({
+        ...(doc.data() as TokenData),
+      }));
+
+      setBalanceData(tokens.length > 0 ? tokens : []); // Ensure it's always an array
+    } catch (error: unknown) {
+      if (error instanceof Error) {
         console.error("Error fetching balances:", error);
+        setError(error.message || "Error fetching balances.");
+      } else {
+        console.error("Unknown error fetching balances:", error);
+        setError("An unknown error occurred while fetching balances.");
       }
-    };
+    }finally {
+      setLoadingg(false);
+    }
+  });
 
-    fetchBalance();
-  }, []); // Added empty dependency array
+  return () => unsubscribe(); // Cleanup listener on unmount
+}, []);
 
-  if (!balanceData) {
+
+ 
+   if (error) {
     return (
-      <Card className="bg-gray-800/50 border-purple-500/20">
-        <CardContent>
-          <div className="text-center text-gray-400">Loading...</div>
-        </CardContent>
-      </Card>
+      <div className="text-center p-2 sm:p-4 flex flex-col items-center">
+        <p className="text-red-500 text-sm sm:text-base">{error}</p>
+      </div>
     );
   }
-  const { balance, value, change, isPositive, symbol } = balanceData;
-
-
+  
+  // Extract necessary values safely
+ //const { balance, value, change, isPositive, symbol } = balanceData || {};
+  
+  
   return (
     <div className="space-y-6">
       {/* Header Section */}
@@ -300,7 +311,7 @@ interface TokenData {
 )}
       </motion.header>
 
-
+     
  <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -391,23 +402,45 @@ interface TokenData {
               ]
             : []),
 
-            {
-              title: symbol,
-              gradient: "linear-gradient(to bottom right, #2193B0, #6DD5ED)",
-              icon: <SiDogecoin style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
-              value: balance !== undefined ? `${balance}` : "Loading...",
-              usdValue: (
-                <div className={`flex items-center gap-1 ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                  {isPositive ? (
-                    <ArrowUpRight className="w-4 h-4" />
-                  ) : (
-                    <ArrowDownRight className="w-4 h-4" />
-                  )}
-                  {change}
-                </div>
-              ),
-              rate: value !== undefined ? `$${value.toLocaleString()}` : "Loading...",
-            }
+        //     ...(balanceData
+        //       ? [
+        //           {
+        //       title: symbol,
+        //       gradient: "linear-gradient(to bottom right, #2193B0, #6DD5ED)",
+        //       icon: <SiDogecoin style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+        //       value: balance !== undefined ? `${balance}` : "Loading...",
+        //       usdValue: (
+        //         <div className={`flex items-center gap-1 ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+        //           {isPositive ? (
+        //             <ArrowUpRight className="w-4 h-4" />
+        //           ) : (
+        //             <ArrowDownRight className="w-4 h-4" />
+        //           )}
+        //           {change}
+        //         </div>
+        //       ),
+        //       rate: value !== undefined ? `$${value.toLocaleString()}` : "Loading...",
+        //     },
+        //   ]
+        // : []),
+
+        // Generate cards dynamically for each token in balanceData
+        ...(Array.isArray(balanceData) && balanceData.length > 0
+    ? balanceData.map((token) => ({
+        title: token.symbol,
+        gradient: "linear-gradient(to bottom right, #2193B0, #6DD5ED)",
+        icon: <SiDogecoin style={{ fontSize: "1.5rem", color: "#FFD700" }} />,
+        value: token.balance !== undefined ? `${token.balance}` : "Loading...",
+        usdValue: (
+          <div className={`flex items-center gap-1 ${token.isPositive ? "text-green-400" : "text-red-400"}`}>
+            {token.isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+            {token.change}
+          </div>
+        ),
+        rate: token.value !== undefined ? `$${token.value.toLocaleString()}` : "Loading...",
+        description: undefined, // Add this to ensure consistency
+      }))
+    : []),
             
              ].map((card, index) => (
                <motion.div
@@ -436,6 +469,27 @@ interface TokenData {
          </Card>
 
          </motion.div>
+         {/* <motion.div
+    whileTap={{ scale: 0.98 }}
+    whileHover={{ scale: 1.05 }}
+    style={{
+      padding: "20px",
+      borderRadius: "1.5rem",
+      background: cardData.gradient,
+      boxShadow: "0 10px 15px rgba(0, 0, 0, 0.3)",
+    }}
+    className="text-white flex flex-col items-start"
+  >
+    <div className="flex justify-between w-full items-center">
+      <h3 style={{ fontSize: "1.5rem", fontWeight: "600" }}>{cardData.title}</h3>
+      {cardData.icon}
+    </div>
+    <span style={{ fontSize: "1.7rem", fontWeight: "bold", marginTop: "1rem" }}>
+      {cardData.value}
+    </span>
+    {cardData.usdValue && <p className="text-sm text-purple-200 mt-1">{cardData.usdValue}</p>}
+    {cardData.rate && <p className="text-xs opacity-80 mt-1">Rate: {cardData.rate}</p>}
+  </motion.div> */}
        {/* Quick Links */}
 <motion.div 
   className="mx-4 sm:mx-4  rounded-lg"  

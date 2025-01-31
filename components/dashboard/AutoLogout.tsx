@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { auth } from "@/lib/firebase";
 
 const AutoLogout = () => {
-  const INACTIVITY_LIMIT = 1 * 60 * 1000; // 10 minutes
+  const INACTIVITY_LIMIT = 50 * 60 * 1000; // 10 minutes
 
   const timer = useRef<NodeJS.Timeout | null>(null);
 

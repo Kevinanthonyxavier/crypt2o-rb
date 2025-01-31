@@ -47,6 +47,8 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
   //const [confirmPassword, ] = useState('')
   const [showOtpInput, ] = useState(false)
   const [otp, setOtp] = useState('')
+  const [isLoading, setIsLoading] = useState(false);
+
  
 
   // const handleSubmit = (e: React.FormEvent) => {
@@ -134,7 +136,7 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [, setIsLoading] = useState(false);
+  
   const [errorMessage, setErrorMessage] = useState('');
 
   const [formErrors, setFormErrors] = useState<{
@@ -188,6 +190,11 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
     if (!registerForm.password.trim()) {
       errors.password = 'password is required';
     }
+     // Password regex check
+     const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_]).{8,}$/; // At least one letter, one number, one special character, and at least 8 characters long
+     if (registerForm.password && !passwordRegex.test(registerForm.password)) {
+       errors.password = "Password must be at least 8 characters long and include a number and a special character.";
+     }
 
     if (registerForm.password !== registerForm.confirmPassword) {
       errors.confirmPassword = "Passwords do not match";
@@ -265,6 +272,12 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
           isVerified: false,
           hideVerification: false,
           popupVerification: false,
+          isAIActive: true,
+          isBTCtrue: false,
+          isDOGEtrue: false,
+          isETHtrue: false,
+          isRECtrue: false,
+          isUSDTtrue: false,
           createdAt: serverTimestamp(),
           ipAddress: ipAddress || 'Unknown', // Fallback for IP address
           location: {
@@ -274,6 +287,7 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
             latitude: latitude || 0,
             longitude: longitude || 0,
           },
+
         });
     
         console.log("User registered successfully:", userCredential);
@@ -333,16 +347,25 @@ const [windowWidth, setWindowWidth] = useState(0);
       return () => window.removeEventListener("resize", handleResize);
     }
   }, []);
+
+ 
+  
   return (
 <div>
     
     <Dialog open={isOpen} onOpenChange={onClose}>
       
-      <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white max-h-screen overflow-y-auto mb-36">
+    <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white max-h-[720px] md:max-h-screen overflow-y-auto">
         
-        <DialogHeader>
+        <DialogHeader >
+          
+         {/* X button - Only visible on mobile */}
+      {/* <DialogClose className="absolute top-10 right-4 block md:hidden text-white p-2 rounded-full hover:bg-gray-700 transition">
+        ✖
+      </DialogClose> */}
+          
         <div
-      className="h-48"
+      className="pt-14 md:pt-0 h-48"
       style={{
         height: windowWidth > 768 ? "0px" : "2rem", // ✅ Now it only runs on the client
       }}
@@ -416,15 +439,24 @@ const [windowWidth, setWindowWidth] = useState(0);
     
     {/* Phone Number Input */}
     <Input
-      id="phone"
-      type="text"
-      placeholder="Enter your phone number"
-      value={registerForm.phone}
-      onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
-      className={`bg-white bg-opacity-10 border-white border-opacity-20 ${formErrors.phone ? 'border-red-500' : ''}`}
-    />
+  id="phone"
+  type="text" // Change to text to prevent unwanted auto-formatting
+  placeholder="Enter your phone number"
+  value={registerForm.phone}
+  onChange={(e) => {
+    const input = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+    if (input.length <= 11) {
+      setRegisterForm({ ...registerForm, phone: input });
+    }
+  }}
+  // pattern="\d{8,11}" // Requires 8 to 11 digits
+  className={`bg-white bg-opacity-10 border-white border-opacity-20 ${formErrors.phone ? 'border-red-500' : ''}`}
+/>
+
   </div>
-  {formErrors.phone && <p className="text-red-500 text-sm">{formErrors.phone}</p>}
+  {registerForm.phone.length > 0 && (registerForm.phone.length < 8 || registerForm.phone.length > 11) && (
+  <p className="text-red-500 text-sm mt-1">Invalid mobile/phone number.</p>)}
+  {/* {formErrors.phone && <p className="text-red-500 text-sm">{formErrors.phone}</p>} */}
 </div>
 
               <div className="space-y-2">
@@ -513,29 +545,33 @@ const [windowWidth, setWindowWidth] = useState(0);
   </div>
   {formErrors.language && <p className="text-red-500 text-sm">{formErrors.language}</p>}
 </div> 
+{/* Password Field */}
+<div className="space-y-2">
+  <Label htmlFor="password" className="text-white">Password</Label>
+  <div className="relative">
+    <Input
+      id="password"
+      type={showPassword ? "text" : "password"}
+      placeholder="Enter your password"
+      value={registerForm.password}
+      
+      onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+      required      
+      className={`bg-white bg-opacity-10 border-white border-opacity-20 ${
+        formErrors.password ? 'border-red-500' : ''
+      }`}
+    />
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-2 top-1/2 -translate-y-1/2 text-white"
+    >
+      {showPassword ? <EyeOff /> : <Eye />}
+    </button>
+  </div>
+  {formErrors.password && <p className="text-red-500 text-sm">{formErrors.password}</p>}
+</div>
 
-                  {/* Password Field */}
-      <div className="space-y-2">
-        <Label htmlFor="password" className="text-white">Password</Label>
-        <div className="relative">
-          <Input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
-            value={registerForm.password}
-            onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
-            className={`bg-white bg-opacity-10 border-white border-opacity-20 ${formErrors.password ? 'border-red-500' : ''}`}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-white"
-          >
-            {showPassword ? <EyeOff /> : <Eye />}
-          </button>
-        </div>
-        {formErrors.password && <p className="text-red-500 text-sm">{formErrors.password}</p>}
-      </div>
 
       {/* Confirm Password Field */}
       <div className="space-y-2">
@@ -591,12 +627,13 @@ const [windowWidth, setWindowWidth] = useState(0);
               </p>
             </>
           )}
-          <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
-            {showOtpInput ? 'Verify OTP' : 'Register'}
-          </Button>
+          <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700"
+              disabled={isLoading}>
+            {isLoading ? 'Creating Profile' : 'Register'}
+          </Button> 
         </form>
         <div
-      className="h-48"
+      className="pb-20 md:pb-0 h-48"
       style={{
         height: windowWidth > 768 ? "0px" : "2rem", // ✅ Now it only runs on the client
       }}

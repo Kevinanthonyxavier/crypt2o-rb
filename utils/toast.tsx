@@ -22,7 +22,7 @@ export const showToast = ({
       {/* Toast notification */}
       <div className={`toast toast-${variant} ${t.visible ? 'opacity-100' : 'opacity-0'}`}>
         <strong className="toast-title">{title}</strong>
-        {description && <p className="toast-description">{description}</p>}
+        {description && <p className="text-center toast-description">{description}</p>}
       </div>
     </>
   ), {

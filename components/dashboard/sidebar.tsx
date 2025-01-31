@@ -126,7 +126,7 @@ const Sidebar: React.FC = () => {
     auth.signOut();
     localStorage.clear();
     if (typeof window !== 'undefined') {
-      console.log(window.location.href  = "/home"); // This will only execute in the browser
+      console.log(window.location.href  = "/#"); // This will only execute in the browser
     }
 
   };

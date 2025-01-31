@@ -1,4 +1,4 @@
-import React, {  useState } from 'react';
+import React, {  useEffect, useState } from 'react';
 import {
   Card,
   CardHeader,
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 //import { useToast } from '@/hooks/use-toast';
 import { collection, getDocs, Timestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase'; // Adjust the import based on your file structure
-import { onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 //import { showToast } from '@/utils/toast';
 
 ///////////////////////////////
@@ -230,7 +230,13 @@ interface RecoveryRequest {
   
 }
   
-
+interface TokenData {
+  balance: string;
+  value: string;
+  change: string;
+  isPositive: boolean;
+  symbol: string;
+}
 
  
 
@@ -270,8 +276,53 @@ const [requests, setRequests] = React.useState<RecoveryRequest[]>([]);
 
 
 ///
+  const [balanceData, setBalanceData] = useState<TokenData | null>(null);
+  const [, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const auth = getAuth();
 
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        console.error("User not logged in.");
+        setLoadingg(false);
+        return;
+      }
+
+     // setUserEmail(user.email);
+      setUserName(user.displayName);
+      setLoadingg(true);
+
+      try {
+        const balancesRef = collection(db, "users", user.uid, "Prereleasetokenbalance");
+        const querySnapshot = await getDocs(balancesRef);
+
+        let tokenData: TokenData | null = null;
+        querySnapshot.forEach((doc) => {
+          tokenData = doc.data() as TokenData;
+        });
+
+        if (tokenData) {
+          setBalanceData(tokenData);
+        } else {
+          console.error("No data found for the user's token balance.");
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error("Error fetching balances:", error);
+          setError(error.message || "Error fetching balances.");
+        } else {
+          console.error("Unknown error fetching balances:", error);
+          setError("An unknown error occurred while fetching balances.");
+        }
+      }finally {
+        setLoadingg(false);
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup listener on unmount
+  }, []);
+//
 React.useEffect(() => {
   // Listen for changes in the authentication state
   const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -455,7 +506,7 @@ const handleCloseModal = () => {
           <div className="relative inline-block">
             <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 blur-3xl opacity-30 animate-pulse" />
             <h1 className="relative text-6xl md:text-8xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-500 animate-gradient-x leading-tight">
-              CryptoBank Token<br />Pre-Release
+              Crypto Token<br />Pre-Release
             </h1>
           </div>
         </HologramEffect>
@@ -504,7 +555,7 @@ const handleCloseModal = () => {
             </h2>
           </HologramEffect>
           <div className="max-w-4xl mx-auto px-4">
-          <CountdownTimer targetDate={new Date('2024-03-01T00:00:00')} />
+          <CountdownTimer />
 
           </div>
         </div>
@@ -619,22 +670,21 @@ className="container mx-auto px-4 py-20 relative z-10">
         </CyberBorder>
       </section>
 
-    {/* Balance Section */}
-    <section className="container mx-auto px-4 py-20 relative z-10">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
-          Your Pre-Release Balance
-        </h2>
-        <p className="text-gray-400 max-w-2xl mx-auto">
-          Track your pre-release token holdings and their current value
-        </p>
-      </div>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-       
-          <BalanceCard  />
-       
-      </div>
-    </section>
+      {balanceData && (
+  <section className="container mx-auto px-4 py-20 relative z-10">
+    <div className="text-center mb-12">
+      <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+        Your Pre-Release Balance
+      </h2>
+      <p className="text-gray-400 max-w-2xl mx-auto">
+        Track your pre-release token holdings and their current value
+      </p>
+    </div>
+    <div className="">
+      <BalanceCard />
+    </div>
+  </section>
+)}
 
     {/* Transaction History Section */}
     <section className="container mx-auto px-4 py-20 relative z-10">

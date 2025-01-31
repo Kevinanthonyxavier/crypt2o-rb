@@ -358,7 +358,7 @@ if (method === "Bank") {
         showToast({
           title: 'Copied',
           description: 'Wallet address copied to clipboard',
-          variant: 'default',
+          variant: 'success',
         });
       })
       .catch(() => {
@@ -375,7 +375,7 @@ if (method === "Bank") {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="space-y-6"
+      className="space-y-6 mb-40"
     >
       <div className="space-y-6">
         
@@ -385,22 +385,22 @@ if (method === "Bank") {
       
 
      
-        <div  style={{ borderRadius: '2rem' }} className=" py-4 mx-12 mb-12 flex items-center justify-center bg-gray-800 border border-gray-700"> {/* Full-height centering container with gray background */}
+        <div className="mx-4 sm:mx-12 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-3xl">
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
         <Card
           // Maintain margin and border-radius
           
-          className="mx-8 w-auto sm:w-[500px] sm:w-py-8 md:w-[500px] lg:w-[600px]  h-auto  bg-gray-800 card-no-border" // Use the same gray color for the card
+          className="mx-6 w-auto sm:w-[500px] sm:w-py-8 md:w-[500px] lg:w-[600px]  h-auto  bg-gray-800 card-no-border" // Use the same gray color for the card
         >
           <div className="  items-center justify-center w-[800] py-8"> {/* Centering content */}
             <CardHeader className="w-full text-center">
             <CardTitle className="text-3xl text-white">Fast Deposit</CardTitle>
           </CardHeader>
       <CardContent className="p-6">
-            <Tabs defaultValue="fiat" className="w-full">
-              <TabsList  style={{ borderRadius: '1.5rem' }} className="grid w-full grid-cols-2 bg-gray-700 rounded-lg p-1">
-                <TabsTrigger value="fiat"  style={{ borderRadius: '0.8rem' }} className="text-lg text-white data-[state=active]:bg-purple-600  hover:bg-green-600 hover:text-white-600">Fiat Deposit</TabsTrigger>
-                <TabsTrigger value="crypto"  style={{ borderRadius: '0.8rem' }} className="text-lg  text-white data-[state=active]:bg-purple-600  hover:bg-green-600 hover:text-white-600">Crypto Deposit</TabsTrigger>
+            <Tabs defaultValue="fiat" className="w-full ">
+            <TabsList style={{ borderRadius: '0.8rem' }}  className="grid w-full grid-cols-2 bg-gray-700 rounded-lg h-14 sm:h-16">
+            <TabsTrigger value="fiat"  style={{ borderRadius: '0.8rem' }} className="text-lg text-white h-full rounded-md data-[state=active]:bg-purple-600 hover:bg-green-600 hover:text-white">Fiat Deposit</TabsTrigger>
+            <TabsTrigger value="crypto"  style={{ borderRadius: '0.8rem' }} className="text-lg text-white h-full rounded-md data-[state=active]:bg-purple-600 hover:bg-green-600 hover:text-white">Crypto Deposit</TabsTrigger>
               </TabsList>
               <TabsContent value="fiat">
                 <motion.div 
@@ -530,6 +530,7 @@ if (method === "Bank") {
       <Select value={CryptoCurrency} onValueChange={handleCurrencyChange}>
         <SelectTrigger 
           id="crypto-currency"  
+          style={{ borderRadius: '0.5rem' }} 
           className={`text-lg bg-gray-700 text-white border-gray-600 rounded-md ${missingFields.includes('crypto-currency') ? 'border-red-500' : ''}`}
         >
           <SelectValue placeholder="Select currency" />
@@ -552,6 +553,7 @@ if (method === "Bank") {
         value={cryptoAmount}
         onChange={(e) => setCryptoAmount(e.target.value)}
         required
+        style={{ borderRadius: '0.5rem' }} 
       />
     </div>
 
@@ -559,6 +561,7 @@ if (method === "Bank") {
       className="text-lg w-full bg-purple-500 hover:bg-purple-600 text-white rounded-md"  
       onClick={handleGenerateDepositAddress} 
       disabled={isLoading}
+      style={{ borderRadius: '0.5rem' }} 
     >
       {isLoading ? 'Generating...' : 'Generate Deposit Address'}
     </Button>
@@ -569,16 +572,16 @@ if (method === "Bank") {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="mt-6 space-y-4 px-4 sm:px-6"
+      className="mt-6 w-full space-y-4 "
     >
       <Card className="bg-gray-700 border-gray-600 rounded-lg">
         <CardHeader>
-          <CardTitle className="text-2xl sm:text-3xl text-white">Deposit Information</CardTitle>
-          <CardDescription className="text-base text-gray-300">
+          <CardTitle className="text-center  text-2xl sm:text-3xl text-white">Deposit Information</CardTitle>
+          <CardDescription className="text-center  text-base text-gray-300">
             Use the following details to complete your deposit
           </CardDescription>
         </CardHeader>
-        <h2 className="text-xl sm:text-2xl text-purple-400 text-center">
+        <h2 className="mb-4 text-xl sm:text-2xl text-purple-400 text-center">
           {CryptoName ? `${CryptoName} QR Code` : "No Crypto Name Available!"}
         </h2>
         <CardContent className="space-y-4">
@@ -592,12 +595,12 @@ if (method === "Bank") {
                 className="object-cover"
               />
             ) : (
-              <p className="text-lg text-gray-300">No QR code available.</p>
+              <p className=" text-center text-lg text-gray-300">No QR code available.</p>
             )}
           </div>
           
           <div className="flex items-center justify-between bg-gray-800 p-2 rounded-md">
-            <span className="text-lg sm:text-xl text-white break-all">
+            <span className="text-center text-lg sm:text-xl text-white break-all">
               {walletAddress || "No wallet address available"}
             </span>
             <Button variant="ghost" size="sm" onClick={() => copyToClipboard(walletAddress)}>
@@ -606,7 +609,7 @@ if (method === "Bank") {
             </Button>
           </div>
           
-          <p className="text-base text-gray-300">
+          <p className="text-center text-base text-gray-300">
             Please note that deposits may take up to 30 minutes to be credited to your account.
           </p>
         </CardContent>
@@ -625,7 +628,7 @@ if (method === "Bank") {
         
       </motion.div>
      </div>
-
+     
      <Dialog open={showFiatDepositPopup} onOpenChange={setShowFiatDepositPopup}>
   <DialogContent className="bg-gray-800 text-white rounded-lg p-6 max-w-sm mx-auto sm:max-w-md">
     <DialogHeader>
