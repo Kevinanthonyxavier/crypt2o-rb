@@ -116,11 +116,11 @@ const Header: React.FC = () => {
 
 
       {/* Tawk Messenger */}
-      {/* <TawkMessengerReact
+      <TawkMessengerReact
         propertyId="64b66b5d94cf5d49dc644d65"
         widgetId="1h5k96q8t"
 
-      /> */}
+      />
     </div>
     
   );

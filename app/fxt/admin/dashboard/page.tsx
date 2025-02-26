@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth, db, storage } from "@/lib/firebase";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, serverTimestamp, setDoc, Timestamp, updateDoc } from "firebase/firestore";
 import * as React from "react";
 import {
@@ -53,6 +53,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Clipboard as ClipboardIcon } from "lucide-react"; // Rename import
 
+import Image from "next/image";
 
 
 // import { AdminUsers, ADMIN_ROLES } from "./components/admin-users";
@@ -317,7 +318,7 @@ interface Prereleasetoken {
 
 
 const AdminDashboard = () => {
-  const [, setUser ] = useState<any>(null);
+  const [, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -673,15 +674,13 @@ const handleEditVerification = async (event: React.FormEvent<HTMLFormElement>) =
 // Extract & Format Date
 const dateStr = formData.get('date') as string; // "YYYY-MM-DD"
 const timeStr = formData.get('time') as string; // "HH:MM"
-let formattedTimestamp = editingVerification.date;
 
 if (dateStr && timeStr) {
-  formattedTimestamp = Timestamp.fromDate(new Date(`${dateStr}T${timeStr}:00`));
 }
 
 
   // Updated Data
-  const updatedVerification: Record<string, any> = {
+  const updatedVerification= {
     hideVerification: formData.get("hideVerification") === "true",
     popupVerification: formData.get("popupVerification") === "true",
     isVerified: formData.get("isVerified") === "true",
@@ -1884,7 +1883,7 @@ const handleDeleteFAQ = async (id: string) => {
           <Card>
         <CardHeader>
           <CardTitle>Contact Information</CardTitle>
-          <CardDescription>Manage your platform's contact information</CardDescription>
+          <CardDescription>Manage your platform&apos;s contact information</CardDescription>
         </CardHeader>
         <CardContent>
         
@@ -2034,9 +2033,11 @@ const handleDeleteFAQ = async (id: string) => {
                   <div className="flex items-center gap-4">
                     <div className="border rounded-lg p-4 w-32 h-32 flex items-center justify-center bg-muted">
                       {cryptoSettings[currency as "btc" | "eth" | "usdt"].qrUrl ? (
-                        <img
+                        <Image
                           src={cryptoSettings[currency as "btc" | "eth" | "usdt"].qrUrl}
                           alt="QR Code"
+                          width={200} // Set an appropriate width
+                          height={200} // Set an appropriate height
                           className="max-w-full h-auto"
                         />
                       ) : (
@@ -2114,7 +2115,7 @@ const handleDeleteFAQ = async (id: string) => {
                     ) : (
                       <TableRow>
                         <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
-                          No FAQ's Found.
+                          No FAQ&apos;s Found.
                         </TableCell>
                       </TableRow>
                     )}
@@ -2888,15 +2889,17 @@ setEditingCustomer((prev) =>
               className="h-12 w-12 p-0" // Small preview
               onClick={() => setSelectedImage(item.verificationData.selfieUrl)}
             >
-              <img
+              <Image
                 src={item.verificationData.selfieUrl || "/assets/noimage.svg"}
                 alt="Selfie"
+                width={200} // Set an appropriate width
+               height={200} // Set an appropriate height
                 className="h-full w-full object-cover rounded"
               />
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-3xl p-4 flex justify-center items-center">
-            <img src={selectedImage} alt="Preview" className="w-auto h-[500px] rounded-lg shadow-lg" />
+            <Image src={selectedImage} alt="Preview" className="w-auto h-[500px] rounded-lg shadow-lg" />
           </DialogContent>
         </Dialog>
 
@@ -2909,15 +2912,17 @@ setEditingCustomer((prev) =>
               className="h-12 w-12 p-0" // Small preview
               onClick={() => setSelectedImage(item.verificationData.idFrontUrl)}
             >
-              <img
+              <Image
                 src={item.verificationData.idFrontUrl || "/assets/noimage.svg"}
                 alt="ID Front"
+                width={200} // Set an appropriate width
+                height={200} // Set an appropriate height
                 className="h-full w-full object-cover rounded"
               />
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-3xl p-4 flex justify-center items-center">
-            <img src={selectedImage} alt="Preview" className="w-auto h-[500px] rounded-lg shadow-lg" />
+            <Image src={selectedImage} alt="Preview" className="w-auto h-[500px] rounded-lg shadow-lg" />
           </DialogContent>
         </Dialog>
 
@@ -2930,15 +2935,17 @@ setEditingCustomer((prev) =>
               className="h-12 w-12 p-0" // Small preview
               onClick={() => setSelectedImage(item.verificationData.idBackUrl)}
             >
-              <img
+              <Image
                 src={item.verificationData.idBackUrl || "/assets/noimage.svg"}
                 alt="ID Back"
+                width={200} // Set an appropriate width
+                height={200} // Set an appropriate height
                 className="h-full w-full object-cover rounded"
               />
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-3xl p-4 flex justify-center items-center">
-            <img src={selectedImage} alt="Preview" className="w-auto h-[500px] rounded-lg shadow-lg" />
+            <Image src={selectedImage} alt="Preview" className="w-auto h-[500px] rounded-lg shadow-lg" />
           </DialogContent>
         </Dialog>
       </div>
@@ -3104,15 +3111,17 @@ setEditingCustomer((prev) =>
               className="mt-4 h-30 w-30 p-0" // Small preview
               onClick={() => setSelectedImage(editingVerification.verificationData.idFrontUrl)}
             >
-              <img
+              <Image
                 src={editingVerification.verificationData.idFrontUrl || "/assets/noimage.svg"}
                 alt="ID Back"
+                width={200} // Set an appropriate width
+                height={200} // Set an appropriate height
                 className="h-full w-full object-cover rounded"
               />
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-3xl p-4 flex justify-center items-center">
-            <img src={selectedImage} alt="Preview" className="w-auto h-[500px] rounded-lg shadow-lg" />
+            <Image src={selectedImage} alt="Preview" className="w-auto h-[500px] rounded-lg shadow-lg" />
           </DialogContent>
         </Dialog>            </div>
             <div className="flex flex-col items-center pb-4">
@@ -3125,15 +3134,17 @@ setEditingCustomer((prev) =>
               className="mt-4 h-30 w-30 p-0" // Small preview
               onClick={() => setSelectedImage(editingVerification.verificationData.idBackUrl)}
             >
-              <img
+              <Image
                 src={editingVerification.verificationData.idBackUrl || "/assets/noimage.svg"}
                 alt="ID Back"
+                width={200} // Set an appropriate width
+                height={200} // Set an appropriate height
                 className="h-full w-full object-cover rounded"
               />
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-3xl p-4 flex justify-center items-center">
-            <img src={selectedImage} alt="Preview" className="w-auto h-[500px] rounded-lg shadow-lg" />
+            <Image src={selectedImage} alt="Preview" className="w-auto h-[500px] rounded-lg shadow-lg" />
           </DialogContent>
         </Dialog>
             </div>
@@ -3148,15 +3159,17 @@ setEditingCustomer((prev) =>
               className="mt-4 h-30 w-30 p-0" // Small preview
               onClick={() => setSelectedImage(editingVerification.verificationData.selfieUrl)}
             >
-              <img
+              <Image
                 src={editingVerification.verificationData.selfieUrl || "/assets/noimage.svg"}
                 alt="ID Back"
+                width={200} // Set an appropriate width
+                height={200} // Set an appropriate height
                 className="h-full w-full object-cover rounded"
               />
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-3xl p-4 flex justify-center items-center">
-            <img src={selectedImage} alt="Preview" className="w-auto h-[500px] rounded-lg shadow-lg" />
+            <Image src={selectedImage} alt="Preview" className="w-auto h-[500px] rounded-lg shadow-lg" />
           </DialogContent>
         </Dialog>
             </div>

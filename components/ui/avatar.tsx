@@ -1,9 +1,12 @@
+
 import * as React from "react";
+import Image, { StaticImageData } from "next/image"; // ✅ Import Next.js Image
 import { cn } from "@/lib/utils";
 
-export interface AvatarProps extends React.ComponentPropsWithoutRef<"div"> {}
+// Define a fallback avatar image (optional)
+const defaultAvatar = "/default-avatar.png"; // Change this to your default avatar path
 
-const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
+const Avatar = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<"div">>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
@@ -14,22 +17,22 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
 );
 Avatar.displayName = "Avatar";
 
-interface AvatarImageProps extends React.ComponentPropsWithoutRef<"img"> {}
-
-const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(
-  ({ className, ...props }, ref) => (
-    <img
-      ref={ref}
+const AvatarImage = React.forwardRef<HTMLImageElement, Omit<React.ComponentPropsWithoutRef<typeof Image>, "ref"> & { src?: string | StaticImageData }>(
+  ({ className, alt = "User Avatar", src, width = 40, height = 40, ...props }) => (
+    <Image
       className={cn("aspect-square h-full w-full", className)}
+      src={src || defaultAvatar} // ✅ Fallback image
+      alt={alt}
+      width={width} // ✅ Default width
+      height={height} // ✅ Default height
       {...props}
     />
   )
 );
 AvatarImage.displayName = "AvatarImage";
 
-interface AvatarFallbackProps extends React.ComponentPropsWithoutRef<"span"> {}
 
-const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(
+const AvatarFallback = React.forwardRef<HTMLSpanElement, React.ComponentPropsWithoutRef<"span">>(
   ({ className, ...props }, ref) => (
     <span
       ref={ref}
