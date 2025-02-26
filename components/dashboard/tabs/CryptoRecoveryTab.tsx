@@ -8,10 +8,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { db, auth } from '@/lib/firebase';
 import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { Badge } from "@/components/ui/badge";
+import { toast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
+import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
+
+
+interface Crypto {
+  id: string;
+  name: string;
+  symbol: string;
+}
 
 interface RecoveryRequest {
   createdAt: Date; // Assuming createdAt is a Date object
@@ -19,9 +29,10 @@ interface RecoveryRequest {
   walletAddress: string;
   description: string;
   status: string;
+  amount: string;
+  type: string;
   submittedAt: string;
 }
-
 
 const CryptoRecoveryTab: React.FC = () => {
   const [email, setEmail] = React.useState<string | null>(null);
@@ -33,6 +44,7 @@ const CryptoRecoveryTab: React.FC = () => {
   const [loadingg, setLoadingg] = React.useState(false);
   const [requests, setRequests] = React.useState<RecoveryRequest[]>([]);
   const [, setLoadingRequests] = React.useState(true);
+  const [amount, setAmount] = React.useState("");
   //const [userEmail, setUserEmail] = React.useState<string | null>(null);
   const [userName, setUserName] = React.useState<string | null>(null);
 
@@ -55,6 +67,37 @@ const CryptoRecoveryTab: React.FC = () => {
     return () => unsubscribe();
   }, []);
   
+
+  const [cryptos, setCryptos] = useState<Crypto[]>([]);
+
+  const [type, setType] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
+  //const [selectedCrypto, setSelectedCrypto] = useState("");
+  
+  // Filter cryptos dynamically
+  const filteredCryptos = cryptos.filter((crypto) =>
+    crypto.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    crypto.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  useEffect(() => {
+    const fetchCryptos = async () => {
+      try {
+        const response = await fetch(
+          "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1"
+        );
+        if (!response.ok) throw new Error("Failed to fetch cryptocurrencies");
+
+        const data: Crypto[] = await response.json();
+        setCryptos(data);
+      } catch (error) {
+        console.error("Error fetching cryptocurrencies:", error);
+      }
+    };
+
+    fetchCryptos();
+  }, []);
+
+
   const fetchUserRequests = async (userEmail: string) => {
     setLoadingRequests(true);
     setLoadingg(true);
@@ -80,8 +123,18 @@ const CryptoRecoveryTab: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+     const user = getAuth().currentUser ;
+        if (!user) {
+          toast({
+            title: "Error",
+            description: "You need to be logged in to cancel a withdrawal.",
+            variant: "destructive",
+          });
+          return;
+        }
   
-    if (!email || !walletAddress || !description) {
+    if (!email || !amount || !type || !walletAddress || !description) {
       setError('All fields are required.');
       return;
     }
@@ -100,6 +153,9 @@ const CryptoRecoveryTab: React.FC = () => {
         email,
         walletAddress,
         description,
+        type,
+        name: user.displayName ,
+        amount,
         status: 'Pending',
         createdAt: new Date().toISOString(),
       });
@@ -113,6 +169,9 @@ const CryptoRecoveryTab: React.FC = () => {
       // Clear the wallet address and description fields
     setWalletAddress('');
     setDescription('');
+    setAmount('');
+    setType('');
+
     
     } catch (error) {
       console.error("Error submitting recovery request:", error);
@@ -121,6 +180,8 @@ const CryptoRecoveryTab: React.FC = () => {
       setLoading(false);
       setLoadingg(false);
     }
+
+    
   };
   
 
@@ -168,7 +229,74 @@ const CryptoRecoveryTab: React.FC = () => {
                   style={{ borderRadius: '0.5rem' }}
                 />
               </div>
+              
 
+<div className="grid grid-cols-2 gap-1">
+  {/* Amount */}
+  <div className="space-y-2">
+    <Label className="text-base sm:text-lg text-white" htmlFor="amount">
+      Amount
+    </Label>
+    <Input
+      id="amount"
+      type="number"
+      value={amount}
+      onChange={(e) => setAmount(e.target.value)}
+      className="text-sm sm:text-base bg-gray-700 text-white border border-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      style={{ borderRadius: "0.5rem" }}
+      maxLength={5}
+      minLength={1}
+      min = {100}
+      placeholder="$"
+      required
+      onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please enter a valid amount.")}
+      onInput={(e) => (e.target as HTMLInputElement).setCustomValidity("")}
+    />
+  </div>
+
+  {/* Crypto Name */}
+ 
+  <div className="space-y-2">
+  <label className="text-base sm:text-lg text-white" htmlFor="crypto-dropdown">
+    Crypto Name
+  </label>
+
+  <Select
+     value={type.toLowerCase()} // Convert to lowercase for matching
+     onValueChange={(value) => {
+       console.log("Selected value:", value);
+       setType(value.toUpperCase()); // Store in uppercase
+     }}
+  >
+    <SelectTrigger id="crypto-dropdown" className="text-white bg-gray-700 border border-gray-600 rounded-lg">
+      <SelectValue placeholder="Select a cryptocurrency" />
+    </SelectTrigger>
+
+    <SelectContent className="bg-gray-800 text-white max-h-64 overflow-y-auto">
+      {/* Add Search Input */}
+      <div className="p-2">
+        <input
+          type="text"
+          placeholder="Search cryptocurrency..."
+          className="w-full p-2 rounded bg-gray-700 text-white placeholder-gray-400"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {filteredCryptos.length > 0 ? (
+        filteredCryptos.map((crypto) => (
+          <SelectItem key={crypto.id} value={crypto.symbol.toLowerCase()}>
+      {crypto.name} ({crypto.symbol.toUpperCase()})
+          </SelectItem>
+        ))
+      ) : (
+        <div className="text-gray-400 px-2 py-1">No matching cryptocurrency found.</div>
+      )}
+    </SelectContent>
+  </Select>
+</div>
+</div>
               {/* Wallet Address */}
               <div className="space-y-2">
                 <Label className="text-base sm:text-lg text-white" htmlFor="wallet-address">
@@ -247,6 +375,8 @@ const CryptoRecoveryTab: React.FC = () => {
                     <TableHead className="text-purple-500 font-bold" style={{ width: '40%' }} >Submitted At</TableHead>
                     <TableHead className="text-purple-500 font-bold">Wallet Address</TableHead>
                     <TableHead className="text-purple-500 font-bold">Description</TableHead>
+                    <TableHead className="text-purple-500 font-bold">Crypto Name</TableHead>
+                    <TableHead className="text-purple-500 font-bold">Amount</TableHead>
                     <TableHead className="text-purple-500 font-bold">Status</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -259,6 +389,8 @@ const CryptoRecoveryTab: React.FC = () => {
                           <TableCell style={{ width: '40%' }}>{request.createdAt ? format(new Date(request.createdAt), 'MMMM dd, yyyy') : 'Invalid Date'}</TableCell>
                           <TableCell>{request.walletAddress}</TableCell>
                           <TableCell>{request.description}</TableCell>
+                          <TableCell>{request.type}</TableCell>
+                          <TableCell>{request.amount}</TableCell>
 
                           <TableCell>
                             <Badge

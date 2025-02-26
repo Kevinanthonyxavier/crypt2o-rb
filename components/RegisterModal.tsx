@@ -281,9 +281,9 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
           createdAt: serverTimestamp(),
           ipAddress: ipAddress || 'Unknown', // Fallback for IP address
           location: {
-            country: country || 'Unknown',
+            ipcountry: country || 'Unknown',
             region: region || 'Unknown',
-            city: city || 'Unknown',
+            ipcity: city || 'Unknown',
             latitude: latitude || 0,
             longitude: longitude || 0,
           },

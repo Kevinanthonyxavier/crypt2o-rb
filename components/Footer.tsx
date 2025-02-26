@@ -3,10 +3,65 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { useState } from 'react'
+import {  useState } from 'react'
 import AffiliateRegistration from './AffiliateRegistration'
 
 export default function Footer() {
+
+  //  const [contactInfo, setContactInfo] = useState<{ 
+  //     phone: string; 
+  //     email: string;
+  //     supportEmail: string;
+  //     salesEmail: string;
+  //     hours: string;
+  //     address: string;
+  //     city: string;
+  //     state: string;
+  //     zip: string;
+  //     country: string;
+  //   } | null>(null);
+    
+  //   //
+  //   useEffect(() => {
+  //     const fetchContactInfo = async () => {
+  //       try {
+  //         const docRef = doc(db, "adminsettings", "general");
+  //         const docSnap = await getDoc(docRef);
+    
+  //         if (docSnap.exists()) {
+  //           const data = docSnap.data();
+  //           console.log("Fetched Contact Info:", data);
+    
+  //           // Force state update by resetting first
+  //           setContactInfo(null);
+  //           setTimeout(() => {
+  //             setContactInfo({
+  //               phone: data.phone || "", 
+  //               email: data.email || "",
+  //               supportEmail: data.supportEmail || "",
+  //               salesEmail: data.salesEmail || "",
+  //               hours: data.hours || "",
+  //               address: data.address || "",
+  //               city: data.city || "",
+  //               state: data.state || "",
+  //               zip: data.zip || "",
+  //               country: data.country || "",
+  //             });
+  //           }, 0);
+  //         } else {
+  //           console.error("No contact info found");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error fetching contact information:", error);
+  //       }
+  //     };
+    
+  //     fetchContactInfo();
+  //   }, []);
+    
+    
+    //
+
   const [isAffiliateModalOpen, setIsAffiliateModalOpen] = useState(false)
   return (
     <footer className="bg-gray-900 py-12 px-4 relative overflow-hidden">
@@ -27,7 +82,8 @@ export default function Footer() {
           >
             <h4 className="text-lg font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Quick Links</h4>
             <ul className="space-y-2">
-              <li><Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">Home</Link></li>
+              <li><Link href="#home" className="text-gray-400 hover:text-purple-400 transition-colors">Home</Link></li>
+
               <li><Link href="#features" className="text-gray-400 hover:text-purple-400 transition-colors">Features</Link></li>
               <li><Link href="#benefits" className="text-gray-400 hover:text-purple-400 transition-colors">Benefits</Link></li>
               <li><Link href="#crypto recovery" className="text-gray-400 hover:text-purple-400 transition-colors">Crypto Recovery Services</Link></li>
@@ -52,8 +108,14 @@ export default function Footer() {
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <h4 className="text-lg font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Contact Us</h4>
-            <p className="text-gray-400">support@cryptobank.com</p>
-            <p className="text-gray-400">+1 (555) 123-4567</p>
+            <p className="text-gray-400">support@crypt2o.com</p>
+            <p className="text-gray-400">1-800-544-2564</p>
+            {/* {contactInfo ? (
+  <p className="text-gray-400">{contactInfo.phone || "Phone not available"}</p>
+) : (
+  <p className="text-gray-400">Loading...</p>
+)} */}
+            
           </motion.div>
         </div>
         

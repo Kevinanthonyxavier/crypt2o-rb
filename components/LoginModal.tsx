@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Checkbox from '@/components/ui/checkbox';
 import { EyeIcon, EyeOffIcon, TriangleAlert } from 'lucide-react';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { showToast } from '@/utils/toast';
 //import { useToast } from '@/hooks/use-toast';
@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
 import {  useUser } from '@/contexts/UserContext';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 
 export interface User {
@@ -189,12 +190,20 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     }
   };
 
+
+
+
   const handleVerifyOtp = useCallback(async () => {
     if (otp.join("").length < 6) {
       setError("Please enter a complete OTP.");
       return;
     }
-
+    if (!userId) {
+      setError("User ID is missing.");
+      return;
+    }
+  
+    console.log("User ID:", userId); // Debugging
     setIsLoading(true);
 
     try {
@@ -206,6 +215,12 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
 
       if (!response.ok) throw new Error("Invalid OTP. Please try again.");
 
+      // ✅ Update lastLogin in Firestore
+    const userRef = doc(db, "lastlogin", userId);
+    await setDoc(userRef, { lastLogin: serverTimestamp() }, { merge: true });
+    console.log("Last login updated in Firestore"); // Debugging
+
+
       showToast({
         title: "Login Successful",
         description: "Welcome to Crypt2o.com!",
@@ -216,7 +231,8 @@ const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "OTP verification failed.";
       setError(errorMessage);
-      showToast({ title: "OTP Verification Failed", description: errorMessage, variant: "destructive" });
+      
+      showToast({ title: "OTP Verification Failed", description: errorMessage, variant: "error" });
     } finally {
       setIsLoading(false);
     }
@@ -482,7 +498,7 @@ className="flex flex-row items-center justify-center text-red-500 text-sm"
 </motion.div>
 )}
 
-        
+<p className="text-sm text-red-500">Please check your Email</p>  
 <Button
     onClick={handleVerifyOtp}
     className={`w-full ${otp.every((digit) => digit !== '') ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-500 cursor-not-allowed'}`}

@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { db } from '@/lib/firebase' // Adjust the path as necessary
-import { collection, addDoc, getDocs, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, serverTimestamp, getDoc, doc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth'; // Import Firebase Auth
 import TawkMessengerReact from "@tawk.to/tawk-messenger-react";
 import { showToast } from '@/utils/toast';
@@ -53,7 +53,7 @@ type FAQItem = {
 
 
 // Support Channels Component
-const SupportChannels: React.FC<{ onLiveChat: () => void; className?: string; contactInfo: { phone: string; email: string } | null }> = ({ onLiveChat, className, contactInfo }) => (
+const SupportChannels: React.FC<{ onLiveChat: () => void; className?: string; contactInfo: { phone: string; supportEmail: string; hours: string  } | null }> = ({ onLiveChat, className, contactInfo }) => (
 <div className={`mt-8 grid gap-8 md:grid-cols-3 ${className }`}>
     {[
       {
@@ -73,8 +73,8 @@ const SupportChannels: React.FC<{ onLiveChat: () => void; className?: string; co
         title: "Email Support",
         description: "Send us an email",
         icon: Mail,
-        detail: contactInfo?.email || "Loading",
-        subDetail: "24/7 Support"
+        detail: contactInfo?.supportEmail || "Loading",
+        subDetail: contactInfo?.hours || "Loading"
       }
     ].map(({ title, description, icon: Icon, action, detail, subDetail }, index) => (
       <motion.div  key={index} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}  >
@@ -115,7 +115,18 @@ const SupportChannels: React.FC<{ onLiveChat: () => void; className?: string; co
 // Main Support Center Component
 const SupportCenter: React.FC = () => {
 
-  const [contactInfo, setContactInfo] = useState<{ phone: string; email: string; } | null>(null);
+  const [contactInfo, setContactInfo] = useState<{ 
+    phone: string; 
+    email: string;
+    supportEmail: string;
+    salesEmail: string;
+    hours: string;
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+  } | null>(null);
   
 
  
@@ -148,27 +159,34 @@ const SupportCenter: React.FC = () => {
     useEffect(() => {
       const fetchContactInfo = async () => {
         try {
-          const contactCollection = collection(db, "adminsettings"); // Change to your collection name
-          const contactSnapshot = await getDocs(contactCollection);
-          const contactData = contactSnapshot.docs.map(doc => doc.data());
-          
-          // Assuming you have a single document for contact info
-          if (contactData.length > 0) {
+          const docRef = doc(db, "adminsettings", "general"); // Reference to the document
+          const docSnap = await getDoc(docRef); // Fetch the document
+    
+          if (docSnap.exists()) {
+            const data = docSnap.data();
             setContactInfo({
-              phone: contactData[0].phone,
-              email: contactData[0].email,
-              
+              phone: data.phone || "", 
+              email: data.email || "",
+              supportEmail: data.supportEmail || "",
+              salesEmail: data.salesEmail || "",
+              hours: data.hours || "",
+              address: data.address || "",
+              city: data.city || "",
+              state: data.state || "",
+              zip: data.zip || "",
+              country: data.country || "",
             });
+          } else {
+            console.error("No contact info found");
           }
         } catch (error) {
           console.error("Error fetching contact information:", error);
-        } finally {
-          setLoading(false);
         }
       };
-  
+    
       fetchContactInfo();
     }, []);
+    
     //
   
     useEffect(() => {

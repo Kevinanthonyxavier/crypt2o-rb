@@ -29,6 +29,7 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 
   const [amount, setAmount] = useState<string>('');
   
+  const [error, setError] = useState<string>(""); // State for the error message
 
 
   const [, setUserCurrency] = useState<number | 0>(0);
@@ -148,7 +149,7 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
     symbol: string; // Changed from boolean to string
   }
   
-    const [error, setError] = useState<string | null>(null);
+    
     const [, setLoadingg] = useState<boolean>(true);
     const [balanceData, setBalanceData] = useState<TokenData[] | null>(null);
    
@@ -192,13 +193,13 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
    
    
     
-      if (error) {
-       return (
-         <div className="text-center p-2 sm:p-4 flex flex-col items-center">
-           <p className="text-red-500 text-sm sm:text-base">{error}</p>
-         </div>
-       );
-     }
+    //   if (error) {
+    //    return (
+    //      <div className="text-center p-2 sm:p-4 flex flex-col items-center">
+    //        <p className="text-red-500 text-sm sm:text-base">{error}</p>
+    //      </div>
+    //    );
+    //  }
      
      //
   const handleWithdraw = () => {
@@ -238,16 +239,22 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
     }
   
     try {
+      const withdrawalAmount = parseFloat(amount);
+      const commission = parseFloat((withdrawalAmount * 0.15).toFixed(2)); // 15% fee
+      //const netAmount = withdrawalAmount - processingFee;
       // Upload data to Firestore
       await addDoc(collection(db, 'withdrawals'), {
         userEmail: user.email,
+        name: user.displayName ,
         amount: parseFloat(amount),
         currency,
         walletAddress,
         status: 'Canceled', // Indicate that the withdrawal was canceled
         date: new Date(), 
         type: 'Withdrawal',
-        method: 'Crypto'
+        method: 'Crypto',
+        commission,
+        commissionstatus: 'Not Paid'
 
       });
   
@@ -284,16 +291,21 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
     }
   
     try {
+      const withdrawalAmount = parseFloat(amount);
+      const commission = parseFloat((withdrawalAmount * 0.15).toFixed(2));
       // Upload data to Firestore
       await addDoc(collection(db, 'withdrawals'), {
         userEmail: user.email,
+        name: user.displayName ,
         amount: parseFloat(amount),
         currency,
         walletAddress,
-        status: 'Waiting', // Indicate that the withdrawal was canceled
+        status: 'Pending', // Indicate that the withdrawal was canceled
         date: new Date(), 
         type: 'Withdrawal',
-        method: 'Crypto'
+        method: 'Crypto',
+        commission,
+        commissionstatus: 'Pending'
 
       });
   
@@ -537,7 +549,7 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
                     </Select>
                   </div>
   
-                  {/* Amount Input */}
+                  {/* Amount Input*/}
                   <div className="space-y-2">
                     <Label htmlFor="amount" className="text-base sm:text-lg text-white">
                       Amount (USD)
@@ -555,12 +567,34 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
                       min="1000"
                       max={calculateTotalBalance()}
                       step="0.01"
+                       style={{ appearance: "none", borderRadius: '0.5rem' }}
                     />
-                    {error && <p className="text-red-500 text-sm">{error}</p>}
-                    {parseFloat(amount) > calculateTotalBalance() && (
-                      <p className="text-red-500 text-sm">You are exceeding your balance.</p>
-                    )}
-                  </div>
+                     {error && <p className="text-red-500 text-sm">{error}</p>}
+                      {amount && parseFloat(amount) > calculateTotalBalance() && (
+                        <p className="text-red-500 text-sm">You are exceeding your balance.</p>
+                      )}
+                    </div> 
+                        {/* Amount Input 
+      <div className="space-y-2">
+        <Label htmlFor="amount" className="text-lg text-white">Amount (USD)</Label>
+        <p className="text-gray-400 text-base">Available balance: ${calculateTotalBalance()} USD</p>
+        <Input
+          id="amount"
+          type="number"
+          placeholder="0.00"
+          value={amount}
+          onChange={handleChange}
+          className="text-lg  bg-gray-700 text-white border border-gray-600 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          style={{ appearance: "none", borderRadius: '0.5rem' }}
+          min="1000"
+          max={calculateTotalBalance()}
+          step="0.01"
+        />
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {parseFloat(amount) > calculateTotalBalance() && (
+          <p className="text-red-500 text-sm mt-1">You are exceeding your balance.</p>
+        )}
+      </div>*/}
   
                   {/* Wallet Address Input */}
                   <div className="space-y-2">

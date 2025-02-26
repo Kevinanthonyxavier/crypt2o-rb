@@ -25,17 +25,28 @@ import { format } from 'date-fns';
 //import { showToast } from "@/utils/toast";
 
 interface Trade {
-  id: string;
+  
   email: string; // User's email
   name: string; // User's email
-  date: Timestamp;
+ 
   pair: string;
-  type: "Buy" | "Sell";
+ 
   buyPrice: number;
   sellPrice: number;
-  amount: number;
+ 
   profitLoss: number;
   status: "Win" | "Loss" | "Pending";
+  id: string;
+  customerName: string;
+  customerEmail: string;
+  cryptoPair: string;
+  customerId: string;
+  type: string;
+  amount: string;
+  investmentAmount: string;
+  tradeResult: string; // Add "closed" here!
+  createdAt: Timestamp;
+  date: Timestamp;
 }
 
 const TradeTab: React.FC = () => {
@@ -69,7 +80,7 @@ const TradeTab: React.FC = () => {
 
             // Query trades collection for trades belonging to the current user
             const tradesCollection = collection(db, "trades");
-            const tradesQuery = query(tradesCollection, where("email", "==", user.email));
+            const tradesQuery = query(tradesCollection, where("customerEmail", "==", user.email));
             const snapshot = await getDocs(tradesQuery);
 
             const tradeData = snapshot.docs.map((doc) => ({
@@ -186,8 +197,8 @@ const TradeTab: React.FC = () => {
    
     className={`px-4 py-2 text-sm sm:text-lg font-medium rounded-lg transition-colors duration-200 ${
       aiToggle
-        ? "bg-blue-800 text-white hover:bg-blue-500"
-        : "bg-gray-600 text-gray-200 hover:bg-gray-700"
+        ? "bg-green-500/20 text-orange-400 hover:bg-green-500/30 motion-safe:animate-[pulse_0.5s_ease-in-out_infinite]"
+        : "bg-orange-500/20 text-orange-400"
     } ${!canToggle ? "cursor-not-allowed " : ""}`}
   >
     {aiToggle ? "AI Trading On" : "AI Trading Off"}
@@ -324,11 +335,11 @@ const TradeTab: React.FC = () => {
                       <TableHead>Date</TableHead>
                       <TableHead>Pair</TableHead>
                       <TableHead>Type</TableHead>
-                      <TableHead>Buy Price</TableHead>
-                      <TableHead>Sell Price</TableHead>
+                     
+                      <TableHead>Investment Amount</TableHead>
                       <TableHead>Amount</TableHead>
-                      <TableHead>Profit/Loss</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>Trade Result
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -339,15 +350,18 @@ const TradeTab: React.FC = () => {
                             ? format(trade.date.toDate(), "dd-MMM-yyyy")
                             : trade.date}
                         </TableCell>
-                        <TableCell>{trade.pair}</TableCell>
+                        <TableCell>{trade.cryptoPair}</TableCell>
                         <TableCell>{trade.type}</TableCell>
-                        <TableCell>${trade.buyPrice.toFixed(2)}</TableCell>
-                        <TableCell>${trade.sellPrice.toFixed(2)}</TableCell>
+                        <TableCell>${trade.investmentAmount}</TableCell>
+                        <TableCell>${trade.amount}</TableCell>
+                       
                         <TableCell>
-                          {trade.amount} {trade.pair.split("/")[0]}
-                        </TableCell>
-                        <TableCell>{trade.profitLoss}</TableCell>
-                        <TableCell>{trade.status}</TableCell>
+                        <span className={`inline-flex items-center px-3 py-1 text-xl font-medium transition-all duration-300
+                        ${trade.tradeResult === 'Loss' ? 'bg-orange-500/20 text-orange-400 ' :
+                                                          trade.tradeResult === 'Profit' ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30 animate-pulse' :
+                                                        'bg-gray-500/20 text-gray-400 hover:bg-gray-500/30'}`}>
+                                                        {trade.tradeResult}
+                                                        </span></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

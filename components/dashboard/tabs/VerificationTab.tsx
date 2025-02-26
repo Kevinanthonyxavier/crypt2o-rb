@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, Check, ChevronLeft, ChevronRight, Upload } from 'lucide-react';
@@ -35,10 +35,10 @@ type FormData = {
   userDob: string;
   addressLine1: string;
   addressLine2: string;
-  city: string;
+  vfcity: string;
   state: string;
   postalCode: string;
-  country: string;
+  vfcountry: string;
   idFront: File | null;
   idBack: File | null;
   selfie: File | null;
@@ -61,10 +61,10 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
     userDob: '',
     addressLine1: '',
     addressLine2: '',
-    city: '',
+    vfcity: '',
     state: '',
     postalCode: '',
-    country: '',
+    vfcountry: '',
     idFront: null,
     idBack: null,
     selfie: null,
@@ -149,10 +149,10 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
       if (!formData.userDob) newErrors.userDob = 'Date of Birth is required';
     } else if (currentStep === 1) {
       if (!formData.addressLine1) newErrors.addressLine1 = 'Address Line 1 is required';
-      if (!formData.city) newErrors.city = 'City is required';
+      if (!formData.vfcity) newErrors.vfcity = 'City is required';
       if (!formData.state) newErrors.state = 'State/Province is required';
       if (!formData.postalCode) newErrors.postalCode = 'Postal Code is required';
-      if (!formData.country) newErrors.country = 'Country is required';
+      if (!formData.vfcountry) newErrors.vfcountry = 'Country is required';
      } else if (currentStep === 2) {
         if (!formData.idType) newErrors.idType = 'ID Type is required';
         if (!formData.idName) newErrors.idNumber = 'ID Number is required';
@@ -207,6 +207,7 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
   
       await updateDoc(userRef, {
         popupVerification: true,
+        vfdate: serverTimestamp(),
         verificationData: {
           idName: formData.idName,
           idType: formData.idType,
@@ -215,14 +216,16 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
           userDob: formData.userDob,
           addressLine1: formData.addressLine1,
           addressLine2: formData.addressLine2,
-          city: formData.city,
+          vfcity: formData.vfcity,
           state: formData.state,
           postalCode: formData.postalCode,
-          country: formData.country,
+          vfcountry: formData.vfcountry,
           idFrontUrl,
           idBackUrl,
           selfieUrl,
         },
+        selfieUrl,
+        
       });
   
       setshowSubmissionPopup(true);
@@ -240,14 +243,15 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
         userDob: '',
         addressLine1: '',
         addressLine2: '',
-        city: '',
+        vfcity: '',
         state: '',
         postalCode: '',
-        country: '',
+        vfcountry: '',
         idFront: null,
         idBack: null,
         selfie: null,
         popupVerification: "true",
+        
       });
     } catch (error) {
       console.error("Error submitting verification:", error);
@@ -384,16 +388,16 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="city" className="text-lg text-white">City</Label>
+                      <Label htmlFor="vfcity" className="text-lg text-white">City</Label>
                       <Input
-                        id="city"
-                        name="city"
-                        value={formData.city}
+                        id="vfcity"
+                        name="vfcity"
+                        value={formData.vfcity}
                         onChange={handleChange}
                         className="text-lg bg-gray-700 text-white border-gray-600"
                         placeholder="Enter city"
                       />
-                      {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
+                      {errors.vfcity && <p className="text-red-500 text-sm mt-1">{errors.vfcity}</p>}
                     </div>
                     <div>
                       <Label htmlFor="state" className="text-lg text-white">State/Province</Label>
@@ -420,20 +424,20 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
                       {errors.postalCode && <p className="text-red-500 text-sm mt-1">{errors.postalCode}</p>}
                     </div>
                     <div>
-                      <Label htmlFor="country" className="text-lg text-white">Country</Label>
-                      <Select name="country" value={formData.country} onValueChange={(value) => handleSelectChange('country', value)}>
-                        <SelectTrigger id="country" className="text-lg bg-gray-700 text-white border-gray-600">
+                      <Label htmlFor="vfcountry" className="text-lg text-white">Country</Label>
+                      <Select name="vfcountry" value={formData.vfcountry} onValueChange={(value) => handleSelectChange('vfcountry', value)}>
+                        <SelectTrigger id="vfcountry" className="text-lg bg-gray-700 text-white border-gray-600">
                           <SelectValue placeholder="Select your country" />
                         </SelectTrigger>
                         <SelectContent className="bg-gray-800 text-white border-gray-700">
-                          <SelectItem className="text-lg" value="us">United States</SelectItem>
-                          <SelectItem className="text-lg" value="ca">Canada</SelectItem>
-                          <SelectItem className="text-lg" value="uk">United Kingdom</SelectItem>
-                          <SelectItem className="text-lg" value="au">Australia</SelectItem>
+                          <SelectItem className="text-lg" value="United States">United States</SelectItem>
+                          <SelectItem className="text-lg" value="Canada">Canada</SelectItem>
+                          <SelectItem className="text-lg" value="United Kingdom">United Kingdom</SelectItem>
+                          <SelectItem className="text-lg" value="Australia">Australia</SelectItem>
                           {/* Add more countries as needed */}
                         </SelectContent>
                       </Select>
-                      {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country}</p>}
+                      {errors.vfcountry && <p className="text-red-500 text-sm mt-1">{errors.vfcountry}</p>}
                     </div>
                   </div>
                 </motion.div>
@@ -454,9 +458,9 @@ const VerificationTab: React.FC<VerificationTabProps> = ({  }) => {
                           <SelectValue className="text-lg" placeholder="Select ID type" />
                         </SelectTrigger>
                         <SelectContent className="text-lg bg-gray-800 text-white border-gray-700">
-                          <SelectItem className="text-lg" value="passport">Passport</SelectItem>
-                          <SelectItem className="text-lg" value="driverLicense">Driver&apos;s License</SelectItem>
-                          <SelectItem className="text-lg" value="nationalId">National ID</SelectItem>
+                          <SelectItem className="text-lg" value="Passport">Passport</SelectItem>
+                          <SelectItem className="text-lg" value="Drivers License">Driver&apos;s License</SelectItem>
+                          <SelectItem className="text-lg" value="National ID">National ID</SelectItem>
                         </SelectContent>
                       </Select>
                       {errors.idType && <p className="text-red-500 text-sm mt-1">{errors.idType}</p>}

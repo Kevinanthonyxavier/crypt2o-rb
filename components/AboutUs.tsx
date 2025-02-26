@@ -485,9 +485,7 @@ Yes! The pre-release phase is limited and spots are filling up fast. Don’t wai
           animate={controls}
           className="max-w-3xl mx-auto text-center pt-12"
         >
-      <motion.p variants={itemVariants} className="text-lg mb-6 text-gray-300">
-      This version is highly engaging, sales-driven, and customer-focused. It creates a sense of urgency, emphasizes exclusive benefits, and assures customers that they’re making a smart, profitable decision by choosing Crypt2o.          </motion.p>
-          <motion.p variants={itemVariants} className="text-lg mb-6 text-gray-300">
+     <motion.p variants={itemVariants} className="text-lg mb-6 text-gray-300">
           The Future of Crypto is Here: Exclusive Pre-Release Coins Only on Crypt2o.com!          </motion.p>
           <motion.p variants={itemVariants} className="text-lg mb-6 text-gray-300">
           No other platform lets you trade pre-release coins, but we do! With our AI-powered trading system, we ensure your assets grow seamlessly while minimizing risks. Don’t just trade—thrive with Crypt2o!          </motion.p>

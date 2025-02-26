@@ -607,7 +607,7 @@ className="container mx-auto px-4 py-20 relative z-10">
                       >
                         <TableCell className="font-medium text-white">{request.name}</TableCell>
                         <TableCell className="text-purple-300">{request.symbol}</TableCell>
-                        <TableCell className="text-purple-300">{request.price}</TableCell>
+                        <TableCell className="text-purple-300">${request.price}</TableCell>
                         <TableCell className="text-purple-300 hidden md:table-cell">{request.supply}</TableCell>
                         <TableCell  className="text-purple-300 hidden md:table-cell">
   {request.date
